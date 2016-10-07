@@ -1,7 +1,4 @@
 $(function () {
-    $.extend($.jCanvas.defaults, {
-        inDegrees: false
-    });
     var canvas = $('canvas');
     setup_start_and_goal(canvas);
     setup_save(canvas);

@@ -1,6 +1,10 @@
-function setup_ros() {
-    var ros = new ROSLIB.Ros({
-        url: window.ros_url
+function setup_ros(ros_url, ros_topic) {
+    if (window.ros !== undefined){
+        window.ros.close();
+    }
+
+    window.ros = new ROSLIB.Ros({
+        url: ros_url
     });
 
     ros.on('connection', function () {
@@ -17,7 +21,7 @@ function setup_ros() {
 
     window.publisher = new ROSLIB.Topic({
         ros: ros,
-        name: window.ros_topic,
+        name: ros_topic,
         messageType: 'std_msgs/String'
     });
 }

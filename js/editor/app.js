@@ -3,8 +3,14 @@ $(function () {
     setup_start_and_goal(canvas);
     setup_save(canvas);
     setup_drawing(canvas);
-    setup_ros();
+    setup_ros(
+        $('input[name=ros-bridge]').val(),
+        window.ros_topic
+    );
 
+    $('input[name=ros-bridge]').on('change', function () {
+        setup_ros($(this).val(), window.ros_topic);
+    });
 
     $('input[name=canvas-width]').on('change', function (e) {
         var width = parseInt($(this).val());

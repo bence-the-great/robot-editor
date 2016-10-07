@@ -27,6 +27,7 @@ function setup_ros(canvas) {
         var data = JSON.parse(message.data);
         console.log(data);
 
+        canvas.removeLayers();
         canvas.attr('width', data.environment.field.width);
         canvas.attr('height', data.environment.field.height);
         canvas.drawLayers();
@@ -51,7 +52,8 @@ function draw_obstacle(canvas, polygon_points) {
         strokeStyle: '#844',
         fillStyle: '#eaa',
         strokeWidth: 1,
-        closed: true
+        closed: true,
+        layer: true
     };
 
     for (var p = 0; p < polygon_points.length; p += 1) {

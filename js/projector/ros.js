@@ -33,22 +33,21 @@ function setup_ros(canvas) {
     });
 
     listener.subscribe(function (message) {
-        var data = JSON.parse(message.data);
-        console.log(data);
+        console.log(message);
 
         canvas.removeLayers();
-        canvas.attr('width', data.environment.field.width);
-        canvas.attr('height', data.environment.field.height);
+        canvas.attr('width', message.environment.field.width);
+        canvas.attr('height', message.environment.field.height);
         canvas.drawLayers();
 
-        for (var index in data.environment.obstacles) {
-            draw_obstacle(canvas, data.environment.obstacles[index]);
+        for (var index in message.environment.obstacles) {
+            draw_obstacle(canvas, message.environment.obstacles[index]);
         }
-        draw_vehicle(canvas, data.robot, data.start, {
+        draw_vehicle(canvas, message.robot, message.start, {
             stroke: '#444',
             fill: '#aaa'
         }, ['start']);
-        draw_vehicle(canvas, data.robot, data.goal, {
+        draw_vehicle(canvas, message.robot, message.goal, {
             stroke: '#444',
             fill: '#aea'
         }, ['goal']);
@@ -113,6 +112,9 @@ function draw_vehicle(canvas, robot_data, waypoint_data, style, groups) {
         x: waypoint_data.x,
         y: waypoint_data.y,
         layer: true,
+        endArrow: true,
+        arrowRadius: 7,
+        arrowAngle: 1,
         groups: groups,
         rotate: waypoint_data.phi,
         x1: 0,

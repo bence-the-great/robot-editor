@@ -31,7 +31,7 @@ function draw_arc(canvas, segment) {
         radius: segment.radius,
         layer: true,
         groups: window.groups.path,
-        start: segment.start,
+        start: segment.arc_start,
         end: segment.arc_start + segment.delta
     });
 }

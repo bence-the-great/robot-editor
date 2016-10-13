@@ -1,4 +1,4 @@
-function setup_ros(ros_url, ros_topic) {
+function setup_ros(ros_url) {
     if (window.ros !== undefined){
         window.ros.close();
     }
@@ -21,7 +21,14 @@ function setup_ros(ros_url, ros_topic) {
 
     window.publisher = new ROSLIB.Topic({
         ros: ros,
-        name: ros_topic,
-        messageType: 'std_msgs/String'
+        name: window.topics.scene.name,
+        messageType: window.topics.scene.message_type
     });
+
+    window.path_publisher = new ROSLIB.Topic({
+        ros: ros,
+        name: window.topics.path.name,
+        messageType: window.topics.path.message_type
+    });
+
 }

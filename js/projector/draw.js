@@ -14,6 +14,7 @@ function draw_line(canvas, segment) {
         strokeStyle: '#000',
         strokeWidth: 1,
         layer: true,
+        groups: window.groups.path,
         x1: segment.start.x,
         y1: segment.start.y,
         x2: segment.end.x,
@@ -29,7 +30,8 @@ function draw_arc(canvas, segment) {
         y: segment.center.y,
         radius: segment.radius,
         layer: true,
+        groups: window.groups.path,
         start: segment.start,
-        end: segment.start + segment.delta
+        end: segment.arc_start + segment.delta
     });
 }

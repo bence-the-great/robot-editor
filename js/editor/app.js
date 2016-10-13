@@ -4,8 +4,7 @@ $(function () {
     setup_save(canvas);
     setup_drawing(canvas);
     setup_ros(
-        $('input[name=ros-bridge]').val(),
-        window.ros_topic
+        $('input[name=ros-bridge]').val()
     );
 
     $('input[name=ros-bridge]').on('change', function () {

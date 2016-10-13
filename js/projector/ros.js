@@ -7,6 +7,15 @@ function setup_ros(canvas) {
 
     ros.on('connection', function () {
         console.log('Connected to websocket server.');
+        path_listener = new ROSLIB.Topic({
+            ros: ros,
+            name: window.topics.path.name,
+            messageType: window.topics.path.message_type
+        });
+
+        path_listener.subscribe(function (message) {
+            draw_segments(canvas, message.segments);
+        });
     });
 
     ros.on('error', function (error) {
@@ -19,8 +28,8 @@ function setup_ros(canvas) {
 
     listener = new ROSLIB.Topic({
         ros: ros,
-        name: window.ros_topic,
-        messageType: 'std_msgs/String'
+        name: window.topics.scene.name,
+        messageType: window.topics.scene.message_type
     });
 
     listener.subscribe(function (message) {
@@ -35,15 +44,14 @@ function setup_ros(canvas) {
         for (var index in data.environment.obstacles) {
             draw_obstacle(canvas, data.environment.obstacles[index]);
         }
-        draw_waypoint(canvas, data.robot, data.start, {
+        draw_vehicle(canvas, data.robot, data.start, {
             stroke: '#444',
             fill: '#aaa'
         }, ['start']);
-        draw_waypoint(canvas, data.robot, data.goal, {
+        draw_vehicle(canvas, data.robot, data.goal, {
             stroke: '#444',
             fill: '#aea'
         }, ['goal']);
-
     });
 }
 
@@ -63,7 +71,7 @@ function draw_obstacle(canvas, polygon_points) {
     canvas.drawLine(obj);
 }
 
-function draw_waypoint(canvas, robot_data, waypoint_data, style, groups) {
+function draw_vehicle(canvas, robot_data, waypoint_data, style, groups) {
     console.log(robot_data);
     console.log(waypoint_data);
 

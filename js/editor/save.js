@@ -6,7 +6,6 @@ function save_to_json() {
     var canvas = $('canvas');
 
     var environment = {
-        type: 'environment',
         field: {
             width: parseInt(canvas.attr('width')),
             height: parseInt(canvas.attr('height'))
@@ -14,7 +13,7 @@ function save_to_json() {
         obstacles: []
     };
     var layers = canvas.getLayerGroup('obstacles');
-    for (var layer = 0; layer < layers.length; layer++) {
+    for (var layer in layers) {
         var object = layers[layer];
         var i = 1;
         var data = [];
@@ -37,9 +36,7 @@ function save_to_json() {
     var goal = canvas.getLayerGroup('goal')[0];
 
     var scene = {
-        type: 'scene',
         robot: {
-            type: 'robot',
             minimumRadius: 44.2725882090055,
             wheelbase: 15.5000000000000,
             body: [
@@ -75,5 +72,5 @@ function save_to_json() {
         environment: environment
     };
     console.log(JSON.stringify(scene));
-    window.publisher.publish(new ROSLIB.Message({data: JSON.stringify(scene)}));
+    window.publisher.publish(new ROSLIB.Message(scene));
 }

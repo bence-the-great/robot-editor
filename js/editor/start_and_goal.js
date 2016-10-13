@@ -107,6 +107,9 @@ function waypoint(canvas, waypoint_data) {
         strokeStyle: '#f44',
         strokeWidth: 2,
         draggable: true,
+        endArrow: true,
+        arrowRadius: 7,
+        arrowAngle: 1,
         cursors: {
             mouseover: 'pointer',
             mousedown: 'move',

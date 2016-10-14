@@ -41,7 +41,7 @@ function setup_ros(canvas) {
         canvas.drawLayers();
 
         for (var index in message.environment.obstacles) {
-            draw_obstacle(canvas, message.environment.obstacles[index]);
+            draw_obstacle(canvas, message.environment.obstacles[index].points);
         }
         draw_vehicle(canvas, message.robot, message.start, {
             stroke: '#444',
@@ -64,8 +64,8 @@ function draw_obstacle(canvas, polygon_points) {
     };
 
     for (var p = 0; p < polygon_points.length; p += 1) {
-        obj['x' + (p + 1)] = polygon_points[p].points.x;
-        obj['y' + (p + 1)] = polygon_points[p].points.y;
+        obj['x' + (p + 1)] = polygon_points[p].x;
+        obj['y' + (p + 1)] = polygon_points[p].y;
     }
     canvas.drawLine(obj);
 }

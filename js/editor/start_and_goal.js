@@ -39,13 +39,13 @@ function setup_start_and_goal(canvas) {
             y4: -10
         }
     };
-    waypoint(canvas, start);
-    waypoint(canvas, goal);
+    waypoint(canvas, start, $('input#id-start-rotation'));
+    waypoint(canvas, goal, $('input#id-goal-rotation'));
     $('input[name=start-rotation]').on('change', function (e) {
         var rotate = $(this).val();
         var layer_group = canvas.getLayerGroup('start');
         for (var i = 0; i < layer_group.length; i++) {
-            layer_group[i].rotate = rotate;
+            layer_group[i].rotate = parseFloat(rotate);
         }
         canvas.drawLayers();
     });
@@ -54,13 +54,13 @@ function setup_start_and_goal(canvas) {
         var rotate = $(this).val();
         var layer_group = canvas.getLayerGroup('goal');
         for (var i = 0; i < layer_group.length; i++) {
-            layer_group[i].rotate = rotate;
+            layer_group[i].rotate = parseFloat(rotate);
         }
         canvas.drawLayers();
     });
 }
 
-function waypoint(canvas, waypoint_data) {
+function waypoint(canvas, waypoint_data, rotation_input) {
     var vehicle_body = {
         strokeStyle: waypoint_data.strokeStyle,
         fillStyle: waypoint_data.fillStyle,
@@ -71,6 +71,9 @@ function waypoint(canvas, waypoint_data) {
             mouseover: 'pointer',
             mousedown: 'move',
             mouseup: 'pointer'
+        },
+        mousedown: function (){
+            rotation_input.focus();
         },
         groups: waypoint_data.groups,
         dragGroups: waypoint_data.groups,
@@ -91,6 +94,9 @@ function waypoint(canvas, waypoint_data) {
             mouseover: 'pointer',
             mousedown: 'move',
             mouseup: 'pointer'
+        },
+        mousedown: function (){
+            rotation_input.focus();
         },
         groups: waypoint_data.groups,
         dragGroups: waypoint_data.groups,
@@ -114,6 +120,9 @@ function waypoint(canvas, waypoint_data) {
             mouseover: 'pointer',
             mousedown: 'move',
             mouseup: 'pointer'
+        },
+        mousedown: function (){
+            rotation_input.focus();
         },
         groups: waypoint_data.groups,
         dragGroups: waypoint_data.groups,

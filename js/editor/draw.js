@@ -35,7 +35,7 @@ function setup_drawing(canvas) {
         }
     });
 
-    canvas.on('click mouseup', function (e) {
+    canvas.on('mouseup', function (e) {
         var position = canvas.position();
         var x = e.clientX - position.left;
         var y = e.clientY - position.top;

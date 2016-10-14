@@ -10,7 +10,8 @@ window.topics = {
     }
 };
 window.groups = {
-    path: 'path'
+    path: 'path',
+    scene: 'scene'
 };
 
 $.extend($.jCanvas.defaults, {

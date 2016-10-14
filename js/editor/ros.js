@@ -1,4 +1,6 @@
 function setup_ros(ros_url) {
+    var rosbridge_url_input = $('input.rosbridge-url');
+    rosbridge_url_input.css('background', 'yellow');
     if (window.ros !== undefined) {
         window.ros.close();
     }

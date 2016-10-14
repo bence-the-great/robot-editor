@@ -1,5 +1,5 @@
 float64 minimumRadius
 float64 wheelbase
-Point[] body 
+Polygon body
 
 

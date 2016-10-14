@@ -9,3 +9,6 @@ canvas {
     margin-left: 5px;
 }
 
+input.rosbridge-url {
+    background-color: red;
+}

@@ -36,9 +36,9 @@ function setup_drawing(canvas) {
     });
 
     canvas.on('mouseup', function (e) {
-        var position = canvas.position();
-        var x = e.clientX - position.left;
-        var y = e.clientY - position.top;
+        var position = canvas.offset();
+        var x = e.pageX - position.left;
+        var y = e.pageY - position.top;
         if (drawing) {
             polygon_points.push([x, y]);
             $('canvas').removeLayerGroup('wip');

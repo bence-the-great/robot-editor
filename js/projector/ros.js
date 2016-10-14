@@ -64,8 +64,8 @@ function draw_obstacle(canvas, polygon_points) {
     };
 
     for (var p = 0; p < polygon_points.length; p += 1) {
-        obj['x' + (p + 1)] = polygon_points[p].x;
-        obj['y' + (p + 1)] = polygon_points[p].y;
+        obj['x' + (p + 1)] = polygon_points[p].points.x;
+        obj['y' + (p + 1)] = polygon_points[p].points.y;
     }
     canvas.drawLine(obj);
 }

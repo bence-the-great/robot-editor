@@ -1,2 +1,2 @@
-Point[] point
+Point[] points
 

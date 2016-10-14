@@ -17,7 +17,7 @@ function save_to_json() {
         var obstacle = layers[layer];
         var obstacle_points = get_obstacle_points(obstacle);
         if (obstacle_points.length > 0) {
-            environment.obstacles.push(obstacle_points);
+            environment.obstacles.push({points: obstacle_points});
         }
     }
     var start = canvas.getLayerGroup('start')[0];

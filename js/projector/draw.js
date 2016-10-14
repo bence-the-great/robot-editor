@@ -83,9 +83,9 @@ function draw_vehicle(canvas, robot_data, vehicle_data, style, groups) {
         rotate: vehicle_data.phi
     };
     console.log(robot_data);
-    for (var i = 0; i < robot_data.body.length; i += 1) {
-        vehicle_body['x' + (i + 1)] = robot_data.body[i].x;
-        vehicle_body['y' + (i + 1)] = robot_data.body[i].y;
+    for (var i = 0; i < robot_data.body.points.length; i += 1) {
+        vehicle_body['x' + (i + 1)] = robot_data.body.points[i].x;
+        vehicle_body['y' + (i + 1)] = robot_data.body.points[i].y;
     }
     console.log(vehicle_body);
 

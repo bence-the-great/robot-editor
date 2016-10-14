@@ -39,8 +39,8 @@ function setup_start_and_goal(canvas) {
             y4: -10
         }
     };
-    waypoint(canvas, start, $('input#id-start-rotation'));
-    waypoint(canvas, goal, $('input#id-goal-rotation'));
+    vehicle(canvas, start, $('input#id-start-rotation'));
+    vehicle(canvas, goal, $('input#id-goal-rotation'));
     $('input[name=start-rotation]').on('change', function (e) {
         var rotate = $(this).val();
         var layer_group = canvas.getLayerGroup('start');
@@ -60,7 +60,7 @@ function setup_start_and_goal(canvas) {
     });
 }
 
-function waypoint(canvas, waypoint_data, rotation_input) {
+function vehicle(canvas, waypoint_data, rotation_input) {
     var vehicle_body = {
         strokeStyle: waypoint_data.strokeStyle,
         fillStyle: waypoint_data.fillStyle,

@@ -42,7 +42,7 @@ function setup_start_and_goal(canvas) {
     vehicle(canvas, start, $('input#id-start-rotation'));
     vehicle(canvas, goal, $('input#id-goal-rotation'));
     $('input[name=start-rotation]').on('change', function (e) {
-        var rotate = $(this).val();
+        var rotate = $(this).val() * -1;
         var layer_group = canvas.getLayerGroup('start');
         for (var i = 0; i < layer_group.length; i++) {
             layer_group[i].rotate = parseFloat(rotate);
@@ -51,7 +51,7 @@ function setup_start_and_goal(canvas) {
     });
 
     $('input[name=goal-rotation]').on('change', function (e) {
-        var rotate = $(this).val();
+        var rotate = $(this).val() * -1;
         var layer_group = canvas.getLayerGroup('goal');
         for (var i = 0; i < layer_group.length; i++) {
             layer_group[i].rotate = parseFloat(rotate);

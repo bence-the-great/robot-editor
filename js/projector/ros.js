@@ -20,12 +20,16 @@ function setup_ros(canvas) {
         });
 
         path_listener.subscribe(function (message) {
+            console.log('Path arrived');
+            console.log(message);
             canvas.removeLayerGroup(window.groups.path);
             canvas.drawLayers();
             draw_segments(canvas, message.segments);
         });
 
         listener.subscribe(function (message) {
+            console.log('Scene arrived');
+            console.log(message);
             canvas.removeLayerGroup(window.groups.scene);
             canvas.attr('width', message.environment.field.width);
             canvas.attr('height', message.environment.field.height);

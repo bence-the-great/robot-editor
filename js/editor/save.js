@@ -4,6 +4,7 @@ function setup_save() {
 
 function save_to_json() {
     var canvas = $('canvas');
+    var height = canvas.height();
 
     var environment = {
         field: {
@@ -15,7 +16,7 @@ function save_to_json() {
     var layers = canvas.getLayerGroup('obstacles');
     for (var layer in layers) {
         var obstacle = layers[layer];
-        var obstacle_points = get_obstacle_points(obstacle);
+        var obstacle_points = get_obstacle_points(obstacle, canvas);
         if (obstacle_points.length > 0) {
             environment.obstacles.push({points: obstacle_points});
         }
@@ -51,13 +52,13 @@ function save_to_json() {
         },
         start: {
             x: start.x,
-            y: start.y,
-            phi: start.rotate
+            y: height - start.y,
+            phi: start.rotate * -1
         },
         goal: {
             x: goal.x,
-            y: goal.y,
-            phi: goal.rotate
+            y: height - goal.y,
+            phi: goal.rotate * -1
         },
         environment: environment
     };
@@ -65,7 +66,7 @@ function save_to_json() {
     window.publisher.publish(new ROSLIB.Message(scene));
 }
 
-function get_obstacle_points(obstacle) {
+function get_obstacle_points(obstacle, canvas) {
     var translate_x = obstacle['x'];
     var translate_y = obstacle['y'];
     var data = [];
@@ -73,7 +74,7 @@ function get_obstacle_points(obstacle) {
     for (var i = 1; obstacle['x' + i] !== undefined && obstacle['y' + i] !== undefined; i++) {
         data.push({
             x: obstacle['x' + i] + translate_x,
-            y: obstacle['y' + i] + translate_y
+            y: canvas.height() - (obstacle['y' + i] + translate_y)
         });
     }
 

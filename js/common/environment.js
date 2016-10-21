@@ -1,4 +1,4 @@
-window.ros_url = 'ws://192.168.5.105:9090';
+window.ros_url = 'ws://152.66.173.222:9090';
 window.topics = {
     scene: {
         name: '/scene',

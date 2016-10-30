@@ -1,36 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="css/editor/app.css">
-    <title>Edit</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/editor/app.css">
+  <title>Edit</title>
 </head>
 <body>
 <div class="toolbar">
-    <button id="save-json-button">Save json</button>
-    <button id="draw-polygon-button">Draw polygon</button>
+  <button id="save-json-button">Save json</button>
+  <button id="draw-polygon-button">Draw polygon</button>
 
-    <label for="id-ros-bridge">ROS bridge</label>
-    <input type="text" name="ros-bridge" class="rosbridge-url" id="id-ros-bridge" value="ws://152.66.173.156:9090">
-    <label for="id-canvas-height">Height</label>
-    <input type="number" name="canvas-height" id="id-canvas-height" value="700">
-    <label for="id-canvas-width">Width</label>
-    <input type="number" name="canvas-width" id="id-canvas-width" value="1200">
-    <label for="id-start-rotation">Start rotation</label>
-    <input type="number" step="0.01" name="start-rotation" id="id-start-rotation" value="0">
-    <label for="id-goal-rotation">Goal rotation</label>
-    <input type="number" step="0.01" name="goal-rotation" id="id-goal-rotation" value="0">
+  <label for="id-ros-bridge">ROS bridge</label>
+  <input type="text" name="ros-bridge" class="rosbridge-url" id="id-ros-bridge" value="ws://152.66.173.156:9090">
+  <label for="id-canvas-height">Height</label>
+  <input type="number" name="canvas-height" id="id-canvas-height" value="700">
+  <label for="id-canvas-width">Width</label>
+  <input type="number" name="canvas-width" id="id-canvas-width" value="1200">
+  <label for="id-start-rotation">Start rotation</label>
+  <input type="number" step="0.01" name="start-rotation" id="id-start-rotation" value="0">
+  <label for="id-goal-rotation">Goal rotation</label>
+  <input type="number" step="0.01" name="goal-rotation" id="id-goal-rotation" value="0">
 </div>
 <div class="canvas">
-    <canvas id="canvas" width="1200" height="700">
-        Your browser does not support the HTML5 canvas tag.
-    </canvas>
+  <canvas id="canvas" width="1200" height="700">
+    Your browser does not support the HTML5 canvas tag.
+  </canvas>
 </div>
 
-<script src="js/common/eventemitter2.min.js"></script>
-<script src="js/common/roslib.min.js"></script>
-<script src="js/common/jquery-3.1.0.min.js"></script>
-<script src="js/common/jcanvas.min.js"></script>
+<script src="js/lib/eventemitter2.min.js"></script>
+<script src="js/lib/roslib.min.js"></script>
+<script src="js/lib/jquery-3.1.0.min.js"></script>
+<script src="js/lib/jcanvas.min.js"></script>
+
 <script src="js/common/environment.js"></script>
 <script src="js/common/math.js"></script>
 

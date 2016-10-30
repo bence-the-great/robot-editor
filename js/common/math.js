@@ -24,8 +24,8 @@ function projected_point(line, point) {
 }
 
 function point_is_inside(line, point) {
-    return (point.x > Math.min(line.start.x, line.end.x)) && (point.x < Math.max(line.start.x, line.end.x)) &&
-        (point.y > Math.min(line.start.y, line.end.y)) && (point.y < Math.max(line.start.y, line.end.y))
+    return (point.x >= Math.min(line.start.x, line.end.x)) && (point.x <= Math.max(line.start.x, line.end.x)) &&
+        (point.y >= Math.min(line.start.y, line.end.y)) && (point.y <= Math.max(line.start.y, line.end.y))
 }
 
 function closest_point(line, point) {

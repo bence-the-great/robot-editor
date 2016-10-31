@@ -139,3 +139,11 @@ function vehicle(canvas, waypoint_data, rotation_input) {
     canvas.drawLine(axis);
     canvas.drawLine(forward_direction);
 }
+
+function get_start_position(canvas) {
+    var obj = canvas.getLayerGroup('start')[0];
+    return {
+        x: obj.x,
+        y: obj.y
+    };
+}

@@ -3,7 +3,7 @@ $(function () {
     setup_start_and_goal(canvas);
     setup_save(canvas);
     setup_drawing(canvas);
-    setup_ros();
+    setup_ros(canvas);
 
     $('input[name=canvas-width]').on('change', function (e) {
         var width = parseInt($(this).val());

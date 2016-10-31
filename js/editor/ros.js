@@ -1,4 +1,4 @@
-function setup_ros() {
+function setup_ros(canvas) {
     window.ros = new ROSLIB.Ros({
         url: window.ros_url
     });
@@ -11,10 +11,20 @@ function setup_ros() {
             name: window.topics.scene.name,
             messageType: window.topics.scene.message_type
         });
-        window.path_publisher = new ROSLIB.Topic({
+
+        path_listener = new ROSLIB.Topic({
             ros: ros,
             name: window.topics.path.name,
             messageType: window.topics.path.message_type
+        });
+
+        path_listener.subscribe(function (message) {
+            console.log('Path arrived');
+            console.log(message);
+            canvas.removeLayerGroup(window.groups.path);
+            canvas.drawLayers();
+            draw_segments(canvas, message.segments);
+            start_following(start_position, message);
         });
     });
 

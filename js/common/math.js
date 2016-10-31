@@ -30,12 +30,20 @@ function point_is_inside(line, point) {
 
 function closest_point(line, point) {
     q = projected_point(line, point);
+    angle_diff =
+        Math.atan2(point.x - line.start.x, point.y - line.start.y)
+        - Math.atan2(line.end.x - line.start.x, line.end.y - line.start.y);
+
+    if (Math.abs(angle_diff) > Math.PI){
+        angle_diff = 2 * Math.PI + angle_diff;
+    }
+
     if (point_is_inside(line, q)) {
-        return q;
+        return {point: q, angle_diff: angle_diff};
     } else if (distance_squared(line.start, point) < distance_squared(line.end, point)) {
-        return line.start;
+        return {point: line.start, angle_diff: angle_diff};
     } else {
-        return line.end;
+        return {point: line.end, angle_diff: angle_diff};
     }
 }
 

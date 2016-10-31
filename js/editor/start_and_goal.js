@@ -8,16 +8,7 @@ function setup_start_and_goal(canvas) {
             y: 10,
             rotate: 0
         },
-        vehicle_body: {
-            x1: 35.5,
-            y1: 10,
-            x2: -4.5,
-            y2: 10,
-            x3: -4.5,
-            y3: -10,
-            x4: 35.5,
-            y4: -10
-        }
+        vehicle_body: window.robot.body
     };
     var goal = {
         strokeStyle: '#444',
@@ -28,16 +19,7 @@ function setup_start_and_goal(canvas) {
             y: 100,
             rotate: 0
         },
-        vehicle_body: {
-            x1: 35.5,
-            y1: 10,
-            x2: -4.5,
-            y2: 10,
-            x3: -4.5,
-            y3: -10,
-            x4: 35.5,
-            y4: -10
-        }
+        vehicle_body: window.robot.body
     };
     vehicle(canvas, start, $('input#id-start-rotation'));
     vehicle(canvas, goal, $('input#id-goal-rotation'));
@@ -103,10 +85,10 @@ function vehicle(canvas, waypoint_data, rotation_input) {
         x: waypoint_data.position.x,
         y: waypoint_data.position.y,
         rotate: waypoint_data.position.rotate,
-        x1: 0,
-        y1: -10,
-        x2: 0,
-        y2: 10
+        x1: window.robot.axis.x1,
+        y1: window.robot.axis.y1,
+        x2: window.robot.axis.x2,
+        y2: window.robot.axis.y2
     };
 
     var forward_direction = {
@@ -129,10 +111,10 @@ function vehicle(canvas, waypoint_data, rotation_input) {
         x: waypoint_data.position.x,
         y: waypoint_data.position.y,
         rotate: waypoint_data.position.rotate,
-        x1: 0,
-        y1: 0,
-        x2: 30,
-        y2: 0
+        x1: window.robot.forward_direction.x1,
+        y1: window.robot.forward_direction.y1,
+        x2: window.robot.forward_direction.x2,
+        y2: window.robot.forward_direction.y2
     };
 
     canvas.drawLine(vehicle_body);

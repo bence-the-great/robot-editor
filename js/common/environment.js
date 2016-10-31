@@ -14,6 +14,31 @@ window.groups = {
     scene: 'scene'
 };
 
+window.robot = {
+    body: {
+        x1: 35.5,
+        y1: 10,
+        x2: -4.5,
+        y2: 10,
+        x3: -4.5,
+        y3: -10,
+        x4: 35.5,
+        y4: -10
+    },
+    axis: {
+        x1: 0,
+        y1: -10,
+        x2: 0,
+        y2: 10
+    },
+    forward_direction: {
+        x1: 0,
+        y1: 0,
+        x2: 30,
+        y2: 0
+    }
+};
+
 $.extend($.jCanvas.defaults, {
     inDegrees: false
 });

@@ -24,7 +24,7 @@ function setup_ros(canvas) {
             canvas.removeLayerGroup(window.groups.path);
             canvas.drawLayers();
             draw_segments(canvas, message.segments);
-            start_following(start_position, message);
+            window.path = message;
         });
     });
 

@@ -4,8 +4,8 @@ function setup_start_and_goal(canvas) {
         fillStyle: '#aaa',
         groups: ['start'],
         position: {
-            x: 10,
-            y: 10,
+            x: 20,
+            y: 20,
             rotate: 0
         },
         vehicle_body: window.robot.body
@@ -53,6 +53,10 @@ function vehicle(canvas, waypoint_data, rotation_input) {
             mouseover: 'pointer',
             mousedown: 'move',
             mouseup: 'pointer'
+        },
+        drag: function (){
+            highlight_closest_point();
+            deta();
         },
         mousedown: function (){
             rotation_input.focus();
@@ -126,6 +130,7 @@ function get_start_position(canvas) {
     var obj = canvas.getLayerGroup('start')[0];
     return {
         x: obj.x,
-        y: obj.y
+        y: obj.y,
+        rotate: obj.rotate
     };
 }

@@ -34,7 +34,7 @@ function closest_point(line, point) {
         Math.atan2(point.x - line.start.x, point.y - line.start.y)
         - Math.atan2(line.end.x - line.start.x, line.end.y - line.start.y);
 
-    if (Math.abs(angle_diff) > Math.PI){
+    if (Math.abs(angle_diff) > Math.PI) {
         angle_diff = 2 * Math.PI + angle_diff;
     }
 
@@ -58,4 +58,24 @@ function closest_point_to_arc(arc, point) {
     // projekció a körre
     // a vetített pont benne van-e a körívben (szög alapján)
     // a legközelebbi pont (valamelyik végpont, ha a vetített pont nincs benne)
+}
+
+function corrigate_angle(angle) {
+    angle = (angle + Math.PI) % (2 * Math.PI);
+    if (angle < 0) {
+        angle += 2 * Math.PI;
+    }
+    return angle - Math.PI;
+}
+
+function directed_angle_dist(theta_delta, dir){
+    var turn = dir ? 1 : -1;
+
+    if(theta_delta === 0.0){
+        return theta_delta;
+    } else if (Math.sign(turn) !== Math.sign(theta_delta)) {
+        theta_delta = Math.sign(turn) * (2 * Math.PI - Math.abs(theta_delta));
+    }
+
+    return theta_delta;
 }

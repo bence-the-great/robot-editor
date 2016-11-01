@@ -26,8 +26,14 @@ function draw_line(canvas, segment) {
 }
 
 function draw_arc(canvas, segment) {
+    var start_theta = 1.57079633 - segment.arc_start;
+    var delta_theta = segment.delta;
+    console.log('start_theta: ' + start_theta + ' delta_theta: ' + delta_theta + ' dir: ' + segment.direction + ' orientation: ' + segment.orientation);
+
+    var orientation = Math.abs(delta_theta) < Math.PI ? segment.orientation : !segment.orientation;
+    var direction =   Math.abs(delta_theta) < Math.PI ? segment.direction : !segment.direction;
     canvas.drawArc({
-        strokeStyle: segment.direction ? '#000' : '#00f',
+        strokeStyle: orientation ? '#000' : '#00f',
         strokeWidth: 1,
         x: segment.center.x,
         y: canvas.height() - segment.center.y,
@@ -38,8 +44,8 @@ function draw_arc(canvas, segment) {
         arrowAngle: 1,
         groups: [window.groups.path],
         start: 1.57079633 - segment.arc_start,
-        end: 1.57079633 - (segment.arc_start + segment.delta),
-        ccw: segment.orientation
+        end: 1.57079633 - (segment.arc_start + directed_angle_dist(delta_theta, segment.direction)),
+        ccw: direction
     });
 }
 

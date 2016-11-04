@@ -26,25 +26,25 @@ function save_to_json() {
 
     var scene = {
         robot: {
-            minimumRadius: 44.2725882090055,
-            wheelbase: 15.5000000000000,
+            minimumRadius: 75,
+            wheelbase: 26.5,
             body: {
                 points: [
                     {
-                        x: 35.5,
-                        y: 10.0
+                        "x": -5.25,
+                        "y": -17.5
                     },
                     {
-                        x: -4.5,
-                        y: 10.0
+                        "x": 36.25,
+                        "y": -17.5
                     },
                     {
-                        x: -4.5,
-                        y: -10.0
+                        "x": 36.25,
+                        "y": 17.5
                     },
                     {
-                        x: 35.5,
-                        y: -10.0
+                        "x": -5.25,
+                        "y": 17.5
                     }
                 ]
             }

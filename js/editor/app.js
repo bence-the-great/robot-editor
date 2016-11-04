@@ -19,17 +19,50 @@ $(function () {
 
     window.path = {
         segments: [
+            // {
+            //     configIntervalType: "ACI",
+            //     arc_start: 3.1,
+            //     delta: -2.4,
+            //     direction: false,
+            //     orientation: false,
+            //     radius: 40,
+            //     center: {x: 100, y: 500},
+            //     start: {x: 0, y: 0},
+            //     end: {x: 0, y: 0}
+            // }
             {
-                configIntervalType: "ACI",
-                arc_start: 3.1,
-                delta: -2.4,
-                direction: false,
+                configIntervalType: "TCI",
+                arc_start: 0,
+                delta: 0,
+                direction: true,
                 orientation: true,
-                radius: 40,
-                center: {x: 100, y: 500},
-                start: {x: 0, y: 0},
-                end: {x: 0, y: 0}
-            }
+                radius: 0,
+                center: {x: 0, y: 0},
+                start: {x: 100, y: canvas.height() - 150},
+                end: {x: 300, y: canvas.height() - 250}
+            },
+            {
+                configIntervalType: "TCI",
+                arc_start: 0,
+                delta: 0,
+                direction: true,
+                orientation: true,
+                radius: 0,
+                center: {x: 0, y: 0},
+                start: {x: 300, y: canvas.height() - 250},
+                end: {x: 400, y: canvas.height() - 250}
+            },
+            {
+                configIntervalType: "TCI",
+                arc_start: 0,
+                delta: 0,
+                direction: true,
+                orientation: true,
+                radius: 0,
+                center: {x: 0, y: 0},
+                start: {x: 400, y: canvas.height() - 250},
+                end: {x: 450, y: canvas.height() - 350}
+            },
         ]
     };
 

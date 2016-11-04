@@ -1,4 +1,4 @@
-window.ros_url = 'ws://152.66.175.233:9090';
+window.ros_url = 'ws://152.66.169.161:9090';
 window.topics = {
     scene: {
         name: '/scene',
@@ -15,15 +15,17 @@ window.groups = {
 };
 
 window.robot = {
+    minimumRadius: 75,
+    wheelbase: 26.5,
     body: {
-        x1: 35.5,
-        y1: 10,
-        x2: -4.5,
-        y2: 10,
-        x3: -4.5,
-        y3: -10,
-        x4: 35.5,
-        y4: -10
+        x1: -5.25,
+        y1: -17.5,
+        x2: 36.25,
+        y2: -17.5,
+        x3: 36.25,
+        y3: 17.5,
+        x4: -5.25,
+        y4: 17.5
     },
     axis: {
         x1: 0,

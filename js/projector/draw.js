@@ -30,8 +30,8 @@ function draw_arc(canvas, segment) {
     var delta_theta = segment.delta;
     console.log('start_theta: ' + start_theta + ' delta_theta: ' + delta_theta + ' dir: ' + segment.direction + ' orientation: ' + segment.orientation);
 
-    var orientation = Math.abs(delta_theta) < Math.PI ? segment.orientation : !segment.orientation;
-    var direction =   Math.abs(delta_theta) < Math.PI ? segment.direction : !segment.direction;
+    var orientation = segment.orientation;
+    var direction =   segment.direction;
     canvas.drawArc({
         strokeStyle: orientation ? '#000' : '#00f',
         strokeWidth: 1,
@@ -41,7 +41,7 @@ function draw_arc(canvas, segment) {
         layer: true,
         endArrow: true,
         arrowRadius: 7,
-        arrowAngle: 1,
+        arrowAngle: orientation ? 1 : 5,
         groups: [window.groups.path],
         start: 1.57079633 - segment.arc_start,
         end: 1.57079633 - (segment.arc_start + directed_angle_dist(delta_theta, segment.direction)),

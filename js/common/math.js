@@ -61,21 +61,10 @@ function closest_point_to_arc(arc, point) {
 }
 
 function corrigate_angle(angle) {
-    angle = (angle + Math.PI) % (2 * Math.PI);
-    if (angle < 0) {
+    if (angle > Math.PI) {
+        angle -= 2 * Math.PI;
+    } else if (angle < -Math.PI) {
         angle += 2 * Math.PI;
     }
-    return angle - Math.PI;
-}
-
-function directed_angle_dist(theta_delta, dir){
-    var turn = dir ? 1 : -1;
-
-    if(theta_delta === 0.0){
-        return theta_delta;
-    } else if (Math.sign(turn) !== Math.sign(theta_delta)) {
-        theta_delta = Math.sign(turn) * (2 * Math.PI - Math.abs(theta_delta));
-    }
-
-    return theta_delta;
+    return angle;
 }

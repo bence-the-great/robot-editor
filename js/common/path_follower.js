@@ -57,12 +57,24 @@ function highlight_closest_point() {
         });
     } else if (active_segment.configIntervalType === "ACI"){
         var angle = Math.PI -  Math.atan2((canvas.height() - active_segment.center.y) - position.y, active_segment.center.x - position.x);
-        console.log(angle);
+
+        var dist_from_start = Math.abs(corrigate_angle(Math.abs(angle - active_segment.arc_start)));
+        var dist_from_end = Math.abs(corrigate_angle(Math.abs(angle - (active_segment.arc_start + active_segment.delta))));
+
         if (angle > Math.max(active_segment.arc_start, active_segment.arc_start + active_segment.delta)){
-            angle = Math.max(active_segment.arc_start, active_segment.arc_start + active_segment.delta)
+            if (dist_from_start < dist_from_end){
+               angle = active_segment.arc_start;
+            } else {
+                angle = active_segment.arc_start + active_segment.delta;
+            }
         } else if (angle < Math.min(active_segment.arc_start, active_segment.arc_start + active_segment.delta)) {
-            angle = Math.min(active_segment.arc_start, active_segment.arc_start + active_segment.delta);
+            if (dist_from_start < dist_from_end){
+               angle = active_segment.arc_start;
+            } else {
+                angle = active_segment.arc_start + active_segment.delta;
+            }
         }
+
         canvas.removeLayerGroup('projected');
         canvas.drawEllipse({
             fillStyle: '#f00',

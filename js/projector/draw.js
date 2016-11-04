@@ -44,7 +44,7 @@ function draw_arc(canvas, segment) {
         arrowAngle: orientation ? 1 : 5,
         groups: [window.groups.path],
         start: 1.57079633 - segment.arc_start,
-        end: 1.57079633 - (segment.arc_start + directed_angle_dist(delta_theta, segment.direction)),
+        end: 1.57079633 - (segment.arc_start + delta_theta),
         ccw: direction
     });
 }

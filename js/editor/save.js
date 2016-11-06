@@ -1,9 +1,22 @@
 function setup_save() {
-    $('#save-json-button').on('click', save_to_json);
+    $('#publish-button').on('click', publish_scene);
+    $('#save-button').on('click', save_scene);
 }
 
-function save_to_json() {
+function save_scene() {
     var canvas = $('canvas');
+    var scene = get_scene(canvas);
+    console.log(JSON.stringify(scene));
+}
+
+function publish_scene() {
+    var canvas = $('canvas');
+    var scene = get_scene(canvas);
+    console.log(JSON.stringify(scene));
+    window.publisher.publish(new ROSLIB.Message(scene));
+}
+
+function get_scene(canvas) {
     var height = canvas.height();
 
     var environment = {
@@ -62,8 +75,7 @@ function save_to_json() {
         },
         environment: environment
     };
-    console.log(JSON.stringify(scene));
-    window.publisher.publish(new ROSLIB.Message(scene));
+    return scene;
 }
 
 function get_obstacle_points(obstacle, canvas) {

@@ -63,3 +63,67 @@ function setup_drawing(canvas) {
         }
     });
 }
+
+function load_scene(canvas, scene_data) {
+    var scene = JSON.parse(scene_data);
+    var environment = scene.environment;
+    canvas.removeLayerGroup('obstacles');
+    canvas.removeLayerGroup('start');
+    canvas.removeLayerGroup('goal');
+
+    canvas.attr('width', environment.field.width);
+    canvas.attr('height', environment.field.height);
+
+    var start = {
+        strokeStyle: '#444',
+        fillStyle: '#aaa',
+        groups: ['start'],
+        position: {
+            x: scene.start.x,
+            y: canvas.height() - scene.start.y,
+            rotate: scene.start.phi
+        },
+        vehicle_body: scene.robot.body
+    };
+    var goal = {
+        strokeStyle: '#444',
+        fillStyle: '#aea',
+        groups: ['goal'],
+        position: {
+            x: scene.goal.x,
+            y: canvas.height() - scene.goal.y,
+            rotate: scene.goal.phi
+        },
+        vehicle_body: window.robot.body
+    };
+
+    vehicle(canvas, start, $('input#id-start-rotation'));
+    vehicle(canvas, goal, $('input#id-goal-rotation'));
+
+    for (index in environment.obstacles) {
+        var obstacle = environment.obstacles[index];
+        var obj = {
+            strokeStyle: '#844',
+            fillStyle: '#eaa',
+            strokeWidth: 1,
+            closed: true,
+            draggable: true,
+            groups: ['obstacles'],
+            cursors: {
+                mouseover: 'pointer',
+                mousedown: 'move',
+                mouseup: 'pointer'
+            },
+            dblclick: function (layer) {
+                canvas.removeLayer(layer.index);
+                canvas.drawLayers();
+            }
+        };
+        for (var p = 0; p < obstacle.points.length; p += 1) {
+            obj['x' + (p + 1)] = obstacle.points[p].x;
+            obj['y' + (p + 1)] = canvas.height() - obstacle.points[p].y;
+        }
+        canvas.drawLine(obj);
+    }
+    canvas.drawLayers();
+}

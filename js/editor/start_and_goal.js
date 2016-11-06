@@ -4,8 +4,8 @@ function setup_start_and_goal(canvas) {
         fillStyle: '#aaa',
         groups: ['start'],
         position: {
-            x: 100,
-            y: 160,
+            x: 62,
+            y: 170,
             rotate: 0
         },
         vehicle_body: window.robot.body
@@ -56,7 +56,6 @@ function vehicle(canvas, waypoint_data, rotation_input) {
         },
         drag: function (){
             highlight_closest_point();
-            deta();
         },
         mousedown: function (){
             rotation_input.focus();

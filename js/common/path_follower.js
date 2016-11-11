@@ -10,7 +10,8 @@ function step() {
     position.y += robot.wheelbase * Math.sin(position.rotate);
 
     if (active_segment === undefined){
-        debugger;
+        clearInterval(window.path_follower_interval);
+        return false;
     }
 
     if (active_segment.configIntervalType === 'TCI') {
@@ -58,12 +59,15 @@ function step() {
             window.active_segment_index += 1;
         }
     } else if (active_segment.configIntervalType === 'ACI') {
-        var angle = Math.PI - Math.atan2((canvas.height() - active_segment.center.y) - position.y, active_segment.center.x - position.x);
+        var projected_point = project_point_to_arc(canvas, position, active_segment);
 
-        var point_x = active_segment.center.x + active_segment.radius * Math.cos(angle);
-        var point_y = (canvas.height() - active_segment.center.y) - active_segment.radius * Math.sin(angle);
-        var point_angle = Math.atan2(-(point_x - active_segment.center.x), (point_y - (canvas.height() - active_segment.center.y)));
-        var angle_diff =  angle - point_angle;
+        var center = {
+            x: active_segment.center.x,
+            y: canvas.height() - active_segment.center.y
+        };
+
+        var sign = active_segment.direction ? -1 : 1;
+        sign *= Math.sign(Math.sqrt(distance_squared(position, center)) - active_segment.radius);
 
         canvas.removeLayerGroup('projected');
         canvas.drawEllipse({
@@ -75,19 +79,17 @@ function step() {
             width: 5, height: 5
         });
         canvas.drawEllipse({
-            fillStyle: '#0f0',
+            fillStyle: '#ff0',
             layer: true,
             groups: ['projected'],
             x: position.x, y: position.y,
             width: 5, height: 5
         });
 
-        console.log('angle: ' + angle);
-
-        var pos_error = Math.sign(angle_diff) * Math.sqrt(Math.pow(point_x - position.x, 2) + Math.pow(point_y - position.y, 2));
+        var pos_error = sign * Math.sqrt(Math.pow(projected_point.x - position.x, 2) + Math.pow(projected_point.y - position.y, 2));
         var pos_output = 0.1 * pos_error;
         var aggregated_output = Math.sign(pos_output) * Math.min(Math.abs(pos_output), 0.7);
-        // console.log('output: ' + aggregated_output);
+        console.log('output: ' + aggregated_output);
 
         for (var index in es) {
             es[index].rotate += 0.5 * (1.5 * Math.tan(aggregated_output) / window.robot.wheelbase);
@@ -136,6 +138,14 @@ function highlight_closest_point() {
         }
     } else if (active_segment.configIntervalType === "ACI"){
         var correct_point = project_point_to_arc(canvas, position, active_segment);
+
+        var center = {
+            x: active_segment.center.x,
+            y: canvas.height() - active_segment.center.y
+        };
+
+        var a = active_segment.direction ? 1 : -1;
+        var sign = a * Math.sign(Math.sqrt(distance_squared(position, center)) - active_segment.radius);
 
         canvas.removeLayerGroup('projected');
         canvas.drawEllipse({

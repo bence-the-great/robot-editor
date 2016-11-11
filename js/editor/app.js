@@ -3,7 +3,7 @@ $(function () {
     setup_start_and_goal(canvas);
     setup_save(canvas);
     setup_drawing(canvas);
-    // setup_ros(canvas);
+    setup_ros(canvas);
 
     $('input[name=canvas-width]').on('change', function (e) {
         var width = parseInt($(this).val());
@@ -27,42 +27,42 @@ $(function () {
                 orientation: true,
                 radius: 0,
                 center: {x: 0, y: 0},
-                start: {x: 80, y: canvas.height() - 160},
+                start: {x: 70, y: canvas.height() - 150},
                 end: {x: 160, y: canvas.height() - 160}
-            },
-            {
-                configIntervalType: "ACI",
-                arc_start: 1.57,
-                delta: -3.14,
-                direction: false,
-                orientation: true,
-                radius: 40,
-                center: {x: 160, y: canvas.height() - 200},
-                start: {x: 0, y: 0},
-                end: {x: 0, y: 0}
-            },
-            {
-                configIntervalType: "TCI",
-                arc_start: 0,
-                delta: 0,
-                direction: true,
-                orientation: true,
-                radius: 0,
-                center: {x: 0, y: 0},
-                start: {x: 160, y: canvas.height() - 240},
-                end: {x: 130, y: canvas.height() - 240}
             },
             {
                 configIntervalType: "ACI",
                 arc_start: 1.57,
                 delta: 3.14,
                 direction: true,
-                orientation: true,
+                orientation: false,
                 radius: 40,
-                center: {x: 130, y: canvas.height() - 280},
+                center: {x: 160, y: canvas.height() - 200},
                 start: {x: 0, y: 0},
                 end: {x: 0, y: 0}
             },
+    //         {
+    //             configIntervalType: "TCI",
+    //             arc_start: 0,
+    //             delta: 0,
+    //             direction: true,
+    //             orientation: true,
+    //             radius: 0,
+    //             center: {x: 0, y: 0},
+    //             start: {x: 160, y: canvas.height() - 240},
+    //             end: {x: 130, y: canvas.height() - 240}
+    //         },
+    //         {
+    //             configIntervalType: "ACI",
+    //             arc_start: 1.57,
+    //             delta: 3.14,
+    //             direction: true,
+    //             orientation: true,
+    //             radius: 40,
+    //             center: {x: 130, y: canvas.height() - 280},
+    //             start: {x: 0, y: 0},
+    //             end: {x: 0, y: 0}
+    //         },
 
             // {
             //     configIntervalType: "TCI",

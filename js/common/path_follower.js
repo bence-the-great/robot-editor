@@ -6,26 +6,55 @@ function step() {
     var position = get_start_position(canvas);
     var active_segment = window.path.segments[window.active_segment_index];
 
-    position.x += robot.wheelbase * Math.cos(position.rotate);
-    position.y += robot.wheelbase * Math.sin(position.rotate);
-
     if (active_segment === undefined){
         clearInterval(window.path_follower_interval);
         return false;
     }
 
+    var reverse = active_segment.orientation ? 1 : -1;
+
+    canvas.removeLayerGroup('projected');
+
+    position.x += reverse * robot.wheelbase * Math.cos(position.rotate);
+    position.y += reverse * robot.wheelbase * Math.sin(position.rotate);
+
     if (active_segment.configIntervalType === 'TCI') {
+        var start = {
+            x: active_segment.start.x,
+            y: canvas.height() - active_segment.start.y
+        };
+        var end = {
+            x: active_segment.end.x,
+            y: canvas.height() - active_segment.end.y
+        };
+        var tmp = subtract(end, start);
+        var line_angle = Math.atan2(tmp.y, tmp.x);
+
+        var new_end = {
+            x: active_segment.end.x + 20 * Math.cos(line_angle),
+            y: canvas.height() - active_segment.end.y + 20 * Math.sin(line_angle)
+        };
+
+        canvas.drawEllipse({
+            fillStyle: '#f66',
+            layer: true,
+            groups: ['projected'],
+            x: active_segment.end.x + 20 * Math.cos(line_angle),
+            y: canvas.height() - active_segment.end.y + 20 * Math.sin(line_angle),
+            width: 5, height: 5
+        });
+
         var d = closest_point({
             start: {
                 x: active_segment.start.x,
                 y: canvas.height() - active_segment.start.y
             }, end: {
-                x: active_segment.end.x,
-                y: canvas.height() - active_segment.end.y
+                x: new_end.x,
+                y: new_end.y
             }
         }, position);
 
-        canvas.removeLayerGroup('projected');
+
         canvas.drawEllipse({
             fillStyle: '#f00',
             layer: true,
@@ -48,13 +77,13 @@ function step() {
 
         for (var index in es) {
             es[index].rotate += 0.5 * (1.5 * Math.tan(aggregated_output) / window.robot.wheelbase);
-            es[index].x += 1.5 * Math.cos(es[index].rotate);
-            es[index].y += 1.5 * Math.sin(es[index].rotate);
+            es[index].x += reverse * 1.5 * Math.cos(es[index].rotate);
+            es[index].y += reverse * 1.5 * Math.sin(es[index].rotate);
             es[index].rotate += 0.5 * (1.5 * Math.tan(aggregated_output) / window.robot.wheelbase);
         }
         canvas.drawLayers();
 
-        var distance = Math.sqrt(Math.pow(active_segment.end.x - d.point.x, 2) + Math.pow((canvas.height() - active_segment.end.y) - d.point.y, 2));
+        var distance = Math.sqrt(Math.pow(new_end.x - d.point.x, 2) + Math.pow(new_end.y - d.point.y, 2));
         if (distance < 2) {
             window.active_segment_index += 1;
         }
@@ -93,8 +122,8 @@ function step() {
 
         for (var index in es) {
             es[index].rotate += 0.5 * (1.5 * Math.tan(aggregated_output) / window.robot.wheelbase);
-            es[index].x += 1.5 * Math.cos(es[index].rotate);
-            es[index].y += 1.5 * Math.sin(es[index].rotate);
+            es[index].x += reverse * 1.5 * Math.cos(es[index].rotate);
+            es[index].y += reverse * 1.5 * Math.sin(es[index].rotate);
             es[index].rotate += 0.5 * (1.5 * Math.tan(aggregated_output) / window.robot.wheelbase);
         }
         canvas.drawLayers();

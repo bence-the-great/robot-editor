@@ -3,7 +3,11 @@ function distance_squared(a, b) {
 }
 
 function scalar_product(a, b) {
-    return (a.x * b.x) + (a.y * b.y)
+    return (a.x * b.x) + (a.y * b.y);
+}
+
+function cross_product(a, b) {
+    return (a.x * b.y) + (a.y * b.x);
 }
 
 function subtract(a, b) {
@@ -65,6 +69,13 @@ function corrigate_angle(angle) {
         angle -= 2 * Math.PI;
     } else if (angle < -Math.PI) {
         angle += 2 * Math.PI;
+    }
+    return angle;
+}
+
+function corrigate_angle2(angle) {
+    if (angle < 0) {
+        angle = (2 * Math.PI) + angle;
     }
     return angle;
 }

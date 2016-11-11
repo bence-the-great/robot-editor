@@ -9,6 +9,10 @@ function step() {
     position.x += robot.wheelbase * Math.cos(position.rotate);
     position.y += robot.wheelbase * Math.sin(position.rotate);
 
+    if (active_segment === undefined){
+        debugger;
+    }
+
     if (active_segment.configIntervalType === 'TCI') {
         var d = closest_point({
             start: {
@@ -56,23 +60,6 @@ function step() {
     } else if (active_segment.configIntervalType === 'ACI') {
         var angle = Math.PI - Math.atan2((canvas.height() - active_segment.center.y) - position.y, active_segment.center.x - position.x);
 
-        var dist_from_start = Math.abs(corrigate_angle(Math.abs(angle - active_segment.arc_start)));
-        var dist_from_end = Math.abs(corrigate_angle(Math.abs(angle - (active_segment.arc_start + active_segment.delta))));
-
-        if (corrigate_angle(angle) > Math.max(corrigate_angle(active_segment.arc_start), corrigate_angle(active_segment.arc_start + active_segment.delta))) {
-            if (dist_from_start < dist_from_end) {
-                angle = active_segment.arc_start;
-            } else {
-                angle = active_segment.arc_start + active_segment.delta;
-            }
-        } else if (corrigate_angle(angle) < Math.min(corrigate_angle(active_segment.arc_start), corrigate_angle(active_segment.arc_start + active_segment.delta))) {
-            if (dist_from_start < dist_from_end) {
-                angle = active_segment.arc_start;
-            } else {
-                angle = active_segment.arc_start + active_segment.delta;
-            }
-        }
-
         var point_x = active_segment.center.x + active_segment.radius * Math.cos(angle);
         var point_y = (canvas.height() - active_segment.center.y) - active_segment.radius * Math.sin(angle);
         var point_angle = Math.atan2(-(point_x - active_segment.center.x), (point_y - (canvas.height() - active_segment.center.y)));
@@ -83,8 +70,8 @@ function step() {
             fillStyle: '#f00',
             layer: true,
             groups: ['projected'],
-            x: point_x,
-            y: point_y,
+            x: projected_point.x,
+            y: projected_point.y,
             width: 5, height: 5
         });
         canvas.drawEllipse({
@@ -95,10 +82,12 @@ function step() {
             width: 5, height: 5
         });
 
+        console.log('angle: ' + angle);
+
         var pos_error = Math.sign(angle_diff) * Math.sqrt(Math.pow(point_x - position.x, 2) + Math.pow(point_y - position.y, 2));
         var pos_output = 0.1 * pos_error;
         var aggregated_output = Math.sign(pos_output) * Math.min(Math.abs(pos_output), 0.7);
-        console.log('output: ' + aggregated_output);
+        // console.log('output: ' + aggregated_output);
 
         for (var index in es) {
             es[index].rotate += 0.5 * (1.5 * Math.tan(aggregated_output) / window.robot.wheelbase);
@@ -110,7 +99,7 @@ function step() {
 
         var s = active_segment.center.x + active_segment.radius * Math.cos(active_segment.arc_start + active_segment.delta);
         var e = (canvas.height() - active_segment.center.y) - active_segment.radius * Math.sin(active_segment.arc_start + active_segment.delta);
-        var distance = Math.sqrt(Math.pow(s - point_x, 2) + Math.pow(e - point_y, 2));
+        var distance = Math.sqrt(Math.pow(s - projected_point.x, 2) + Math.pow(e - projected_point.y, 2));
 
         if (distance < 2) {
             window.active_segment_index += 1;
@@ -134,19 +123,10 @@ function highlight_closest_point() {
         }, position);
         canvas.removeLayerGroup('projected');
         canvas.drawEllipse({
-            fillStyle: '#f00',
-            layer: true,
-            groups: ['projected'],
-            x: d.point.x, y: d.point.y,
-            width: 5, height: 5
-        });
-
-        canvas.drawEllipse({
             fillStyle: '#ff0',
             layer: true,
             groups: ['projected'],
-            x: active_segment.end.x,
-            y: canvas.height() -active_segment.end.y,
+            x: d.point.x, y: d.point.y,
             width: 5, height: 5
         });
 
@@ -155,74 +135,66 @@ function highlight_closest_point() {
             window.active_segment_index += 1;
         }
     } else if (active_segment.configIntervalType === "ACI"){
-        var angle = Math.PI -  Math.atan2((canvas.height() - active_segment.center.y) - position.y, active_segment.center.x - position.x);
-
-        var dist_from_start = active_segment.arc_start - angle;
-        var dist_from_end = (active_segment.arc_start + active_segment.delta) - angle;
-
-        console.log('angle: ' + angle);
-        console.log('start: ' + active_segment.arc_start + '(' + dist_from_start + ')');
-        console.log('  end: ' + (active_segment.arc_start + active_segment.delta) + '(' + dist_from_end + ')');
-
-        // if (corrigate_angle(angle) > Math.max(corrigate_angle(active_segment.arc_start), corrigate_angle(active_segment.arc_start + active_segment.delta))){
-        //     if (dist_from_start < dist_from_end){
-        //        angle = active_segment.arc_start;
-        //     } else {
-        //         angle = active_segment.arc_start + active_segment.delta;
-        //     }
-        // } else if (corrigate_angle(angle) < Math.min(corrigate_angle(active_segment.arc_start), corrigate_angle(active_segment.arc_start + active_segment.delta))) {
-        //     if (dist_from_start < dist_from_end){
-        //        angle = active_segment.arc_start;
-        //     } else {
-        //         angle = active_segment.arc_start + active_segment.delta;
-        //     }
-        // }
-
-        var point_x = active_segment.center.x + active_segment.radius * Math.cos(angle);
-        var point_y = (canvas.height() - active_segment.center.y) - active_segment.radius * Math.sin(angle);
-        var point_angle = Math.atan2(-(point_x - active_segment.center.x), (point_y - (canvas.height() - active_segment.center.y)));
-        var angle_diff = point_angle - angle;
-
-        canvas.drawLine({
-                strokeStyle: '#0f0',
-                strokeWidth: 1,
-                layer: true,
-                groups: ['projected'],
-                endArrow: true,
-                arrowRadius: 7,
-                arrowAngle: 1,
-                x1: point_x,
-                y1: point_y,
-                x2: point_x + 20 * Math.cos(point_angle),
-                y2: point_y + 20 * Math.sin(point_angle)
-            });
+        var correct_point = project_point_to_arc(canvas, position, active_segment);
 
         canvas.removeLayerGroup('projected');
         canvas.drawEllipse({
-            fillStyle: '#f00',
+            fillStyle: '#ff0',
             layer: true,
             groups: ['projected'],
-            x: point_x,
-            y: point_y,
+            x: correct_point.x,
+            y: correct_point.y,
             width: 5, height: 5
         });
 
         var s = active_segment.center.x + active_segment.radius * Math.cos(active_segment.arc_start + active_segment.delta);
         var e = (canvas.height() - active_segment.center.y) - active_segment.radius * Math.sin(active_segment.arc_start + active_segment.delta);
-        var distance = Math.sqrt(Math.pow(s - point_x, 2) + Math.pow(e - point_y, 2));
 
+        var distance = Math.sqrt(Math.pow(s - correct_point.x, 2) + Math.pow(e - correct_point.y, 2));
         if (distance < 2) {
             window.active_segment_index += 1;
         }
     }
 }
 
-function deta() {
-    var canvas = $('canvas');
-    var position = get_start_position(canvas);
-    var active_segment = window.path.segments[window.active_segment_index];
-    var distance = Math.sqrt(Math.pow(active_segment.end.x - position.x, 2) + Math.pow((canvas.height() - active_segment.end.y) - position.y, 2));
-    if (distance < 15) {
-        window.active_segment_index += 1;
+function project_point_to_arc(canvas, position, segment){
+    var angle = corrigate_angle2(Math.atan2((-position.y) - (-(canvas.height() - segment.center.y)), position.x - segment.center.x));
+    var point = {
+        x: segment.center.x + segment.radius * Math.cos(angle),
+        y: (canvas.height() - segment.center.y) - segment.radius * Math.sin(angle)
+    };
+    var point_start = {
+            x: segment.center.x + segment.radius * Math.cos(segment.arc_start),
+            y: (canvas.height() - segment.center.y) - segment.radius * Math.sin(segment.arc_start)
+        };
+    var point_end = {
+            x: segment.center.x + segment.radius * Math.cos(segment.arc_start + segment.delta),
+            y: (canvas.height() - segment.center.y) - segment.radius * Math.sin(segment.arc_start + segment.delta)
+        };
+    var distance_from_start = corrigate_angle2(Math.atan2((-point.y) - (-(canvas.height() - segment.center.y)), point.x - segment.center.x) - segment.arc_start);
+
+    var is_between = false;
+    if (segment.direction) {  // ccw
+        is_between = Math.abs(distance_from_start) <= Math.abs(segment.delta);
+    } else {  // cw
+        is_between = Math.abs(distance_from_start) >= (2 * Math.PI - Math.abs(segment.delta));
+    }
+
+    if (is_between) {
+        return point;
+    } else {
+        if(segment.direction) {
+            if (Math.abs((2 * Math.PI) - distance_from_start) < Math.abs(distance_from_start - segment.delta)){
+                return point_start;
+            } else {
+                return point_end;
+            }
+        } else {
+            if (Math.abs((2 * Math.PI) - distance_from_start) > Math.abs(distance_from_start - segment.delta)){
+                return point_start;
+            } else {
+                return point_end;
+            }
+        }
     }
 }

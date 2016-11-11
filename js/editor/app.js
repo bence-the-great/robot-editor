@@ -3,7 +3,7 @@ $(function () {
     setup_start_and_goal(canvas);
     setup_save(canvas);
     setup_drawing(canvas);
-    setup_ros(canvas);
+    // setup_ros(canvas);
 
     $('input[name=canvas-width]').on('change', function (e) {
         var width = parseInt($(this).val());
@@ -106,14 +106,8 @@ $(function () {
                 y2: canvas.height() - segment.end.y
             });
         } else if (segment.configIntervalType === "ACI") {
-            var start_theta = segment.arc_start;
-            var delta_theta = segment.delta;
-            console.log('start_theta: ' + start_theta + ' delta_theta: ' + delta_theta + ' dir: ' + segment.direction + ' orientation: ' + segment.orientation);
-
-            var orientation = Math.abs(delta_theta) < Math.PI ? segment.orientation : !segment.orientation;
-            var direction = Math.abs(delta_theta) < Math.PI ? segment.direction : !segment.direction;
             canvas.drawArc({
-                strokeStyle: orientation ? '#000' : '#00f',
+                strokeStyle: segment.orientation ? '#000' : '#00f',
                 strokeWidth: 1,
                 x: segment.center.x,
                 y: canvas.height() - segment.center.y,
@@ -124,8 +118,8 @@ $(function () {
                 arrowAngle: 1,
                 groups: [window.groups.path],
                 start: 1.57079633 - segment.arc_start,
-                end: 1.57079633 - (segment.arc_start + delta_theta),
-                ccw: direction
+                end: 1.57079633 - (segment.arc_start + segment.delta),
+                ccw: segment.direction
             });
         }
     }

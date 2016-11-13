@@ -18,6 +18,10 @@ $(function () {
         canvas.drawLayers();
     });
 
+    $('#start-button').on('click', function (e) {
+        window.path_follower_interval = setInterval(step, 30)
+    });
+
     // test_path_follower(canvas);
 
 });

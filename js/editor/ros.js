@@ -24,7 +24,9 @@ function setup_ros(canvas) {
             canvas.removeLayerGroup(window.groups.path);
             canvas.drawLayers();
             draw_segments(canvas, message.segments);
+            // TODO transform y coordinates
             window.path = message;
+            transform_ys(window.path)
         });
     });
 
@@ -35,4 +37,13 @@ function setup_ros(canvas) {
     ros.on('close', function () {
         console.log('Connection to websocket server closed.');
     });
+}
+
+function transform_ys(path){
+    for (var index in path.segments){
+        var segment = path.segments[index];
+        transform_y_coordinate(segment.start);
+        transform_y_coordinate(segment.end);
+        transform_y_coordinate(segment.center);
+    }
 }

@@ -79,3 +79,7 @@ function corrigate_angle2(angle) {
     }
     return angle;
 }
+
+function transform_y_coordinate(vector){
+    vector.y = window.canvas.height() - vector.y;
+}

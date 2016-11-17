@@ -1,5 +1,6 @@
 window.active_segment_index = 0;
 window.overrun_segment = null;
+var last_error = null;
 
 function step() {
     var canvas = $('canvas');
@@ -47,7 +48,9 @@ function step() {
         });
 
         var pos_error = Math.sign(d.angle_diff) * Math.sqrt(Math.pow(d.point.x - position.x, 2) + Math.pow(d.point.y - position.y, 2));
-        var pos_output = 0.1 * pos_error;
+        var d_error = pos_error - last_error;
+        last_error = pos_error;
+        var pos_output = 0.1 * pos_error + 0.1 * d_error;
         var aggregated_output = Math.sign(pos_output) * Math.min(Math.abs(pos_output), 0.5);
 
         for (var index in es) {
@@ -91,7 +94,9 @@ function step() {
         });
 
         var pos_error = sign * Math.sqrt(Math.pow(projected_point.x - position.x, 2) + Math.pow(projected_point.y - position.y, 2));
-        var pos_output = 0.1 * pos_error;
+        var d_error = pos_error - last_error;
+        last_error = pos_error;
+        var pos_output = 0.1 * pos_error + 0.1 * d_error;
         var aggregated_output = Math.sign(pos_output) * Math.min(Math.abs(pos_output), 0.7);
 
         for (var index in es) {
@@ -319,7 +324,9 @@ function construct_overrun_from_ACI(segment) {
     return segm;
 }
 
-function determine_active_segment () {
+function determine_active_segment() {
+    last_error = null;
+
     if (window.overrun_segment !== null) {
         window.overrun_segment = null;
         window.active_segment_index += 1;

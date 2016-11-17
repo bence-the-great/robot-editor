@@ -3,10 +3,17 @@ function setup_save() {
     $('#save-button').on('click', save_scene);
 }
 
+function setup_load() {
+    $('#load-button').on('click', function () {
+        var scene_json = $('input[name=scene]').val();
+        load_scene($('canvas'), scene_json);
+    });
+}
+
 function save_scene() {
     var canvas = $('canvas');
-    var scene = get_scene(canvas);
-    console.log(JSON.stringify(scene));
+    var scene = JSON.stringify(get_scene(canvas));
+    $('input[name=scene]').val(scene);
 }
 
 function publish_scene() {

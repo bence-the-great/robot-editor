@@ -83,7 +83,7 @@ function load_scene(canvas, scene_data) {
             y: canvas.height() - scene.start.y,
             rotate: scene.start.phi
         },
-        vehicle_body: scene.robot.body
+        vehicle_body: window.robot.body
     };
     var goal = {
         strokeStyle: '#444',

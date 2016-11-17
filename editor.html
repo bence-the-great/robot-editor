@@ -18,6 +18,9 @@
   <input type="number" step="0.01" name="start-rotation" id="id-start-rotation" value="0">
   <label for="id-goal-rotation">Goal rotation</label>
   <input type="number" step="0.01" name="goal-rotation" id="id-goal-rotation" value="0">
+  <button id="save-button">Save</button>
+  <input type="text" name="scene" id="id-scene" placeholder="Scene JSON">
+  <button id="load-button">Load</button>
 </div>
 <div class="canvas">
   <canvas id="canvas" width="1200" height="700">
@@ -39,6 +42,7 @@
 <script src="js/editor/draw.js"></script>
 <script src="js/projector/draw.js"></script>
 <script src="js/editor/ros.js"></script>
+<script src="js/editor/sample_path.js"></script>
 <script src="js/editor/app.js"></script>
 </body>
 </html>

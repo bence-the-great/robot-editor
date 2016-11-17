@@ -128,8 +128,8 @@ function vehicle(canvas, waypoint_data, rotation_input) {
 function get_start_position(canvas) {
     var obj = canvas.getLayerGroup('start')[0];
     return {
-        x: obj.x,
-        y: obj.y,
+        x: obj.x + Math.random() * 2 - 1,
+        y: obj.y + Math.random() * 2 - 1,
         rotate: obj.rotate
     };
 }

@@ -47,7 +47,7 @@ function step() {
             width: 5, height: 5
         });
 
-        var pos_error = Math.sign(d.angle_diff) * Math.sqrt(Math.pow(d.point.x - position.x, 2) + Math.pow(d.point.y - position.y, 2));
+        var pos_error = Math.sign(-d.angle_diff) * Math.sqrt(Math.pow(d.point.x - position.x, 2) + Math.pow(d.point.y - position.y, 2));
         var d_error = pos_error - last_error;
         last_error = pos_error;
         var pos_output = 0.1 * pos_error + 0.1 * d_error;

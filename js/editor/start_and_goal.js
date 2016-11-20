@@ -4,8 +4,8 @@ function setup_start_and_goal(canvas) {
         fillStyle: '#aaa',
         groups: ['start'],
         position: {
-            x: 62,
-            y: 170,
+            x: 182,
+            y: 200,
             rotate: 0
         },
         vehicle_body: window.robot.body

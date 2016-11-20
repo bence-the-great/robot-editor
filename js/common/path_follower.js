@@ -8,7 +8,7 @@ function step() {
     var position = get_start_position(canvas);
     var active_segment = get_active_segment();
 
-    if (active_segment === undefined){
+    if (active_segment === undefined) {
         clearInterval(window.path_follower_interval);
         return false;
     }
@@ -144,7 +144,7 @@ function highlight_closest_point() {
         if (distance < 2) {
             determine_active_segment();
         }
-    } else if (active_segment.configIntervalType === "ACI"){
+    } else if (active_segment.configIntervalType === "ACI") {
         var correct_point = project_point_to_arc(canvas, position, active_segment);
 
         var center = {
@@ -175,20 +175,20 @@ function highlight_closest_point() {
     }
 }
 
-function project_point_to_arc(canvas, position, segment){
+function project_point_to_arc(canvas, position, segment) {
     var angle = corrigate_angle2(Math.atan2((-position.y) - (-segment.center.y), position.x - segment.center.x));
     var point = {
         x: segment.center.x + segment.radius * Math.cos(angle),
         y: segment.center.y - segment.radius * Math.sin(angle)
     };
     var point_start = {
-            x: segment.center.x + segment.radius * Math.cos(segment.arc_start),
-            y: segment.center.y - segment.radius * Math.sin(segment.arc_start)
-        };
+        x: segment.center.x + segment.radius * Math.cos(segment.arc_start),
+        y: segment.center.y - segment.radius * Math.sin(segment.arc_start)
+    };
     var point_end = {
-            x: segment.center.x + segment.radius * Math.cos(segment.arc_start + segment.delta),
-            y: segment.center.y - segment.radius * Math.sin(segment.arc_start + segment.delta)
-        };
+        x: segment.center.x + segment.radius * Math.cos(segment.arc_start + segment.delta),
+        y: segment.center.y - segment.radius * Math.sin(segment.arc_start + segment.delta)
+    };
     var distance_from_start = corrigate_angle2(Math.atan2((-point.y) - (-segment.center.y), point.x - segment.center.x) - segment.arc_start);
 
     var is_between = false;
@@ -201,14 +201,14 @@ function project_point_to_arc(canvas, position, segment){
     if (is_between) {
         return point;
     } else {
-        if(segment.direction) {
-            if (Math.abs((2 * Math.PI) - distance_from_start) < Math.abs(distance_from_start - segment.delta)){
+        if (segment.direction) {
+            if (Math.abs((2 * Math.PI) - distance_from_start) < Math.abs(distance_from_start - segment.delta)) {
                 return point_start;
             } else {
                 return point_end;
             }
         } else {
-            if (Math.abs((2 * Math.PI) - distance_from_start) > Math.abs(distance_from_start - segment.delta)){
+            if (Math.abs((2 * Math.PI) - distance_from_start) > Math.abs(distance_from_start - segment.delta)) {
                 return point_start;
             } else {
                 return point_end;
@@ -279,13 +279,13 @@ function construct_overrun_from_ACI(segment) {
     var a = multiplier * (segment.arc_start + segment.delta);
     var end_point = {
         x: segment.center.x + segment.radius * Math.cos(a),
-        y: segment.center.y - segment.radius * Math.sin(a)
+        y: segment.center.y - multiplier *  segment.radius * Math.sin(a)
     };
     var center = {
         x: segment.center.x,
         y: segment.center.y,
     };
-    var diff = subtract(center, end_point);
+    var diff = segment.direction ? subtract(end_point, center) : subtract(center, end_point);
     var line_angle = Math.atan2(-diff.x, diff.y);
 
     var new_end = {
@@ -293,7 +293,7 @@ function construct_overrun_from_ACI(segment) {
         y: end_point.y - window.robot.wheelbase * Math.sin(-line_angle)
     };
 
-    var segm =  {
+    var segm = {
         configIntervalType: "TCI",
         arc_start: 0,
         delta: 0,

@@ -1,10 +1,5 @@
 window.states = [];
 
-window.active_segment_index = 0;
-window.overrun_segment = null;
-var last_error = null;
-var filtered = 0;
-
 function steps() {
     for (var i = 0; i < robot_count; i++) {
         step(i);
@@ -13,9 +8,10 @@ function steps() {
 
 function step(current_robot_index) {
     var canvas = $('canvas');
+    var state = window.states[current_robot_index];
     var es = canvas.getLayerGroup(create_start_name(current_robot_index));
     var position = get_start_position(canvas, current_robot_index);
-    var active_segment = get_active_segment(current_robot_index);
+    var active_segment = get_active_segment(state);
 
     if (active_segment === undefined) {
         stop_following();
@@ -57,8 +53,8 @@ function step(current_robot_index) {
         });
 
         var pos_error = Math.sign(-d.angle_diff) * Math.sqrt(Math.pow(d.point.x - position.x, 2) + Math.pow(d.point.y - position.y, 2));
-        var d_error = pos_error - last_error;
-        last_error = pos_error;
+        var d_error = pos_error - state.last_error;
+        state.last_error = pos_error;
         var pos_output = 0.1 * pos_error + 0.1 * d_error;
         var aggregated_output = Math.sign(pos_output) * Math.min(Math.abs(pos_output), 0.5);
 
@@ -72,7 +68,7 @@ function step(current_robot_index) {
 
         var distance = Math.sqrt(Math.pow(active_segment.end.x - d.point.x, 2) + Math.pow(active_segment.end.y - d.point.y, 2));
         if (distance < 2) {
-            determine_active_segment(current_robot_index);
+            determine_active_segment(state);
         }
     } else if (active_segment.configIntervalType === 'ACI') {
         var projected_point = project_point_to_arc(canvas, position, active_segment);
@@ -103,19 +99,19 @@ function step(current_robot_index) {
         });
 
         var pos_error = sign * Math.sqrt(Math.pow(projected_point.x - position.x, 2) + Math.pow(projected_point.y - position.y, 2));
-        var d_error = pos_error - last_error;
-        last_error = pos_error;
+        var d_error = pos_error - state.last_error;
+        state.last_error = pos_error;
         var pos_output = 0.1 * pos_error + 0.1 * d_error;
         var aggregated_output = Math.sign(pos_output) * Math.min(Math.abs(pos_output), 0.7);
 
         var alpha = 0.9;
-        filtered = alpha * filtered + (1 - alpha) * aggregated_output;
+        state.filtered = alpha * state.filtered + (1 - alpha) * aggregated_output;
 
         for (var index in es) {
-            es[index].rotate += 0.5 * (1.5 * Math.tan(filtered) / window.robot.wheelbase);
+            es[index].rotate += 0.5 * (1.5 * Math.tan(state.filtered) / window.robot.wheelbase);
             es[index].x += reverse * 1.5 * Math.cos(es[index].rotate);
             es[index].y += reverse * 1.5 * Math.sin(es[index].rotate);
-            es[index].rotate += 0.5 * (1.5 * Math.tan(filtered) / window.robot.wheelbase);
+            es[index].rotate += 0.5 * (1.5 * Math.tan(state.filtered) / window.robot.wheelbase);
         }
         canvas.drawLayers();
 
@@ -124,18 +120,18 @@ function step(current_robot_index) {
         var distance = Math.sqrt(Math.pow(s - projected_point.x, 2) + Math.pow(e - projected_point.y, 2));
 
         if (distance < 2) {
-            determine_active_segment(current_robot_index);
+            determine_active_segment(state);
         }
     } else {
-        determine_active_segment(current_robot_index);
+        determine_active_segment(state);
     }
 }
 
 function highlight_closest_point() {
     var canvas = $('canvas');
-    var current_robot_index = 0;
+    var state = window.states[0];
     var position = get_start_position(canvas);
-    var active_segment = window.paths[current_robot_index].segments[window.active_segment_index];
+    var active_segment = window.paths[state.robot_index].segments[state.active_segment_index];
     if (active_segment.configIntervalType === 'TCI') {
         var d = closest_point({
             start: {
@@ -157,7 +153,7 @@ function highlight_closest_point() {
 
         var distance = Math.sqrt(Math.pow(active_segment.end.x - d.point.x, 2) + Math.pow(active_segment.end.y - d.point.y, 2));
         if (distance < 2) {
-            determine_active_segment(current_robot_index);
+            determine_active_segment(state);
         }
     } else if (active_segment.configIntervalType === "ACI") {
         var correct_point = project_point_to_arc(canvas, position, active_segment);
@@ -185,10 +181,10 @@ function highlight_closest_point() {
 
         var distance = Math.sqrt(Math.pow(s - correct_point.x, 2) + Math.pow(e - correct_point.y, 2));
         if (distance < 2) {
-            determine_active_segment(current_robot_index);
+            determine_active_segment(state);
         }
     } else {
-        determine_active_segment(current_robot_index);
+        determine_active_segment(state);
     }
 }
 
@@ -234,10 +230,10 @@ function project_point_to_arc(canvas, position, segment) {
     }
 }
 
-function get_active_segment(robot_index) {
-    var active_segment = window.paths[robot_index].segments[window.active_segment_index];
+function get_active_segment(state) {
+    var active_segment = window.paths[state.robot_index].segments[state.active_segment_index];
 
-    if (window.overrun_segment !== null) {
+    if (state.overrun_segment !== null) {
         if (active_segment.configIntervalType === 'TCI') {
             return construct_overrun_from_TCI(active_segment);
         } else {
@@ -341,21 +337,21 @@ function construct_overrun_from_ACI(segment) {
     return segm;
 }
 
-function determine_active_segment(robot_index) {
-    last_error = null;
+function determine_active_segment(state) {
+    state.last_error = null;
 
-    if (window.overrun_segment !== null) {
-        window.overrun_segment = null;
-        window.active_segment_index += 1;
+    if (state.overrun_segment !== null) {
+        state.overrun_segment = null;
+        state.active_segment_index += 1;
     } else {
-        var next_index = window.active_segment_index + 1;
+        var next_index = state.active_segment_index + 1;
 
-        if (window.paths[robot_index].segments.length <= next_index) {
-            window.overrun_segment = window.active_segment_index;
-        } else if (window.paths[robot_index].segments[next_index].orientation !== window.paths[robot_index].segments[window.active_segment_index].orientation) {
-            window.overrun_segment = window.active_segment_index;
+        if (window.paths[state.robot_index].segments.length <= next_index) {
+            state.overrun_segment = state.active_segment_index;
+        } else if (window.paths[state.robot_index].segments[next_index].orientation !== window.paths[state.robot_index].segments[state.active_segment_index].orientation) {
+            state.overrun_segment = state.active_segment_index;
         } else {
-            window.active_segment_index += 1;
+            state.active_segment_index += 1;
         }
     }
 }
@@ -375,14 +371,11 @@ function reset_state() {
     window.states = [];
     for (var i = 0; i < robot_count; i++) {
         window.states[i] = {
+            robot_index: i,
             active_segment_index: 0,
             overrun_segment: null,
             last_error: null,
             filtered: 0
         };
     }
-    active_segment_index = 0;
-    window.overrun_segment = null;
-    last_error = null;
-    filtered = 0;
 }

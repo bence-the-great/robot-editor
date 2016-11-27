@@ -1,5 +1,12 @@
 function setup_save() {
-    $('#publish-button').on('click', publish_scene);
+    $('#publish-button').on('click', function(){
+        window.paths = [];
+        for (var i = 0; i < robot_count; i++) {
+            canvas.removeLayerGroup(create_path_name(i));
+            canvas.drawLayers();
+        }
+        publish_scene(0);
+    });
     $('#save-button').on('click', save_scene);
 }
 
@@ -12,14 +19,44 @@ function setup_load() {
 
 function save_scene() {
     var canvas = $('canvas');
-    var scene = JSON.stringify(get_scene(canvas));
-    $('input[name=scene]').val(scene);
+    var scene = get_scene(canvas);
+    scene.configs = [];
+    for (var index = 0; index < robot_count; index++) {
+        var start = canvas.getLayerGroup(create_start_name(index))[0];
+        var goal = canvas.getLayerGroup(create_goal_name(index))[0];
+
+        scene.configs.push({
+            index: index,
+            start: {
+                x: start.x,
+                y: canvas.height() - start.y,
+                phi: start.rotate * -1
+            },
+            goal: {
+                x: goal.x,
+                y: canvas.height() - goal.y,
+                phi: goal.rotate * -1
+            }
+        });
+    }
+    $('input[name=scene]').val(JSON.stringify(scene));
 }
 
-function publish_scene() {
+function publish_scene(index) {
     var canvas = $('canvas');
+    var start = canvas.getLayerGroup(create_start_name(index))[0];
+    var goal = canvas.getLayerGroup(create_goal_name(index))[0];
     var scene = get_scene(canvas);
-    console.log(JSON.stringify(scene));
+    scene.start = {
+        x: start.x,
+        y: canvas.height() - start.y,
+        phi: start.rotate * -1
+    };
+    scene.goal = {
+        x: goal.x,
+        y: canvas.height() - goal.y,
+        phi: goal.rotate * -1
+    };
     window.publisher.publish(new ROSLIB.Message(scene));
 }
 
@@ -41,8 +78,6 @@ function get_scene(canvas) {
             environment.obstacles.push({points: obstacle_points});
         }
     }
-    var start = canvas.getLayerGroup('start')[0];
-    var goal = canvas.getLayerGroup('goal')[0];
 
     var scene = {
         robot: {
@@ -69,16 +104,6 @@ function get_scene(canvas) {
                 ]
             }
 
-        },
-        start: {
-            x: start.x,
-            y: height - start.y,
-            phi: start.rotate * -1
-        },
-        goal: {
-            x: goal.x,
-            y: height - goal.y,
-            phi: goal.rotate * -1
         },
         environment: environment
     };

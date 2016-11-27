@@ -1,7 +1,7 @@
 $(function () {
     var canvas = $('canvas');
     window.canvas = canvas;
-    setup_start_and_goal(canvas);
+    add_start_and_goal(canvas, robot_count);
     setup_save(canvas);
     setup_load(canvas);
     setup_drawing(canvas);
@@ -19,9 +19,28 @@ $(function () {
         canvas.drawLayers();
     });
 
-    $('#start-button').on('click', function (e) {
-        window.path_follower_interval = setInterval(step, 20)
+    $('#start-button').on('click', start_following);
+
+    $('input[name=start-rotation]').on('change', function (e) {
+        var rotate = $(this).val() * -1;
+        var layer_group = canvas.getLayerGroup('start' + selected_robot_index);
+        for (var i = 0; i < layer_group.length; i++) {
+            layer_group[i].rotate = parseFloat(rotate);
+        }
+        canvas.drawLayers();
     });
 
+    $('input[name=goal-rotation]').on('change', function (e) {
+        var rotate = $(this).val() * -1;
+        var layer_group = canvas.getLayerGroup('goal' + selected_robot_index);
+        for (var i = 0; i < layer_group.length; i++) {
+            layer_group[i].rotate = parseFloat(rotate);
+        }
+        canvas.drawLayers();
+    });
+
+    $('#add-robot-button').on('click', function (e) {
+        add_start_and_goal(canvas, robot_count);
+    });
 
 });

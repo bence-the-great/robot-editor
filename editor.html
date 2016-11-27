@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
   <link rel="stylesheet" href="css/editor/app.css">
   <title>Edit</title>
 </head>
@@ -21,6 +22,7 @@
   <button id="save-button">Save</button>
   <input type="text" name="scene" id="id-scene" placeholder="Scene JSON">
   <button id="load-button">Load</button>
+  <button id="add-robot-button">Add robot</button>
 </div>
 <div class="canvas">
   <canvas id="canvas" width="1200" height="700">
@@ -38,7 +40,7 @@
 <script src="js/common/path_follower.js"></script>
 
 <script src="js/editor/start_and_goal.js"></script>
-<script src="js/editor/save.js"></script>
+<script src="js/editor/save_and_publish.js"></script>
 <script src="js/editor/draw.js"></script>
 <script src="js/projector/draw.js"></script>
 <script src="js/editor/ros.js"></script>

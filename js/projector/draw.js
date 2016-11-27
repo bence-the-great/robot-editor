@@ -1,15 +1,15 @@
-function draw_segments(canvas, segments) {
+function draw_segments(canvas, segments, robot_index) {
     for (var i in segments) {
         var segment = segments[i];
         if (segment.configIntervalType === 'TCI') {
-            draw_line(canvas, segment);
+            draw_line(canvas, segment, robot_index);
         } else if (segment.configIntervalType === 'ACI') {
-            draw_arc(canvas, segment);
+            draw_arc(canvas, segment, robot_index);
         }
     }
 }
 
-function draw_line(canvas, segment) {
+function draw_line(canvas, segment, robot_index) {
     canvas.drawLine({
         strokeStyle: segment.orientation ? '#000' : '#00f',
         strokeWidth: 1,
@@ -17,7 +17,7 @@ function draw_line(canvas, segment) {
         endArrow: true,
         arrowRadius: 7,
         arrowAngle: 1,
-        groups: [window.groups.path],
+        groups: [create_path_name(robot_index)],
         x1: segment.start.x,
         y1: canvas.height() - segment.start.y,
         x2: segment.end.x,
@@ -25,10 +25,9 @@ function draw_line(canvas, segment) {
     });
 }
 
-function draw_arc(canvas, segment) {
+function draw_arc(canvas, segment, robot_index) {
     var start_theta = 1.57079633 - segment.arc_start;
     var delta_theta = segment.delta;
-    console.log('start_theta: ' + start_theta + ' delta_theta: ' + delta_theta + ' dir: ' + segment.direction + ' orientation: ' + segment.orientation);
 
     var orientation = segment.orientation;
     var direction =   segment.direction;
@@ -42,7 +41,7 @@ function draw_arc(canvas, segment) {
         endArrow: true,
         arrowRadius: 7,
         arrowAngle: orientation ? 1 : 5,
-        groups: [window.groups.path],
+        groups: [create_path_name(robot_index)],
         start: 1.57079633 - segment.arc_start,
         end: 1.57079633 - (segment.arc_start + delta_theta),
         ccw: direction

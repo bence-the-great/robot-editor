@@ -74,31 +74,43 @@ function load_scene(canvas, scene_data) {
     canvas.attr('width', environment.field.width);
     canvas.attr('height', environment.field.height);
 
-    var start = {
-        strokeStyle: '#444',
-        fillStyle: '#aaa',
-        groups: ['start'],
-        position: {
-            x: scene.start.x,
-            y: canvas.height() - scene.start.y,
-            rotate: scene.start.phi
-        },
-        vehicle_body: window.robot.body
-    };
-    var goal = {
-        strokeStyle: '#444',
-        fillStyle: '#aea',
-        groups: ['goal'],
-        position: {
-            x: scene.goal.x,
-            y: canvas.height() - scene.goal.y,
-            rotate: scene.goal.phi
-        },
-        vehicle_body: window.robot.body
-    };
+    for (var i=0; i<robot_count; i++){
+        canvas.removeLayerGroup(create_start_name(i));
+        canvas.removeLayerGroup(create_goal_name(i));
+    }
 
-    vehicle(canvas, start, $('input#id-start-rotation'));
-    vehicle(canvas, goal, $('input#id-goal-rotation'));
+    robot_count = 0;
+
+    for (var index in scene.configs) {
+        var config = scene.configs[index];
+
+        var start = {
+            strokeStyle: '#444',
+            fillStyle: '#aaa',
+            groups: [create_start_name(config.index)],
+            position: {
+                x: config.start.x,
+                y: canvas.height() - config.start.y,
+                rotate: config.start.phi
+            },
+            vehicle_body: window.robot.body
+        };
+        var goal = {
+            strokeStyle: '#444',
+            fillStyle: '#aea',
+            groups: [create_goal_name(config.index)],
+            position: {
+                x: config.goal.x,
+                y: canvas.height() - config.goal.y,
+                rotate: config.goal.phi
+            },
+            vehicle_body: window.robot.body
+        };
+
+        vehicle(canvas, start, $('input#id-start-rotation'), config.index);
+        vehicle(canvas, goal, $('input#id-goal-rotation'), config.index);
+        robot_count += 1;
+    }
 
     for (index in environment.obstacles) {
         var obstacle = environment.obstacles[index];

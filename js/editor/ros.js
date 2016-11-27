@@ -1,3 +1,5 @@
+window.paths = [];
+
 function setup_ros(canvas) {
     window.ros = new ROSLIB.Ros({
         url: window.ros_url
@@ -19,14 +21,13 @@ function setup_ros(canvas) {
         });
 
         path_listener.subscribe(function (message) {
-            console.log('Path arrived');
             console.log(message);
-            canvas.removeLayerGroup(window.groups.path);
-            canvas.drawLayers();
-            draw_segments(canvas, message.segments);
-            // TODO transform y coordinates
-            window.path = message;
-            transform_ys(window.path)
+            draw_segments(canvas, message.segments, window.paths.length);
+            window.paths.push(message);
+            transform_ys(window.paths[window.paths.length - 1]);
+            if (window.paths.length < robot_count) {
+                publish_scene(window.paths.length);
+            }
         });
     });
 

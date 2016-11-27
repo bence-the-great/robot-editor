@@ -1,8 +1,11 @@
-function setup_start_and_goal(canvas) {
+var selected_robot_index = 0;
+var robot_count = 0;
+
+function add_start_and_goal(canvas, robot_index) {
     var start = {
         strokeStyle: '#444',
         fillStyle: '#aaa',
-        groups: ['start'],
+        groups: [create_start_name(robot_index)],
         position: {
             x: 182,
             y: 200,
@@ -13,7 +16,7 @@ function setup_start_and_goal(canvas) {
     var goal = {
         strokeStyle: '#444',
         fillStyle: '#aea',
-        groups: ['goal'],
+        groups: [create_goal_name(robot_index)],
         position: {
             x: 50,
             y: 120,
@@ -21,28 +24,12 @@ function setup_start_and_goal(canvas) {
         },
         vehicle_body: window.robot.body
     };
-    vehicle(canvas, start, $('input#id-start-rotation'));
-    vehicle(canvas, goal, $('input#id-goal-rotation'));
-    $('input[name=start-rotation]').on('change', function (e) {
-        var rotate = $(this).val() * -1;
-        var layer_group = canvas.getLayerGroup('start');
-        for (var i = 0; i < layer_group.length; i++) {
-            layer_group[i].rotate = parseFloat(rotate);
-        }
-        canvas.drawLayers();
-    });
-
-    $('input[name=goal-rotation]').on('change', function (e) {
-        var rotate = $(this).val() * -1;
-        var layer_group = canvas.getLayerGroup('goal');
-        for (var i = 0; i < layer_group.length; i++) {
-            layer_group[i].rotate = parseFloat(rotate);
-        }
-        canvas.drawLayers();
-    });
+    vehicle(canvas, start, $('input#id-start-rotation'), robot_index);
+    vehicle(canvas, goal, $('input#id-goal-rotation'), robot_index);
+    robot_count += 1;
 }
 
-function vehicle(canvas, waypoint_data, rotation_input) {
+function vehicle(canvas, waypoint_data, rotation_input, robot_index) {
     var vehicle_body = {
         strokeStyle: waypoint_data.strokeStyle,
         fillStyle: waypoint_data.fillStyle,
@@ -58,6 +45,7 @@ function vehicle(canvas, waypoint_data, rotation_input) {
             highlight_closest_point();
         },
         mousedown: function (){
+            selected_robot_index = robot_index;
             rotation_input.focus();
         },
         groups: waypoint_data.groups,
@@ -72,7 +60,7 @@ function vehicle(canvas, waypoint_data, rotation_input) {
     }
 
     var axis = {
-        strokeStyle: '#44f',
+        strokeStyle: '#444',
         strokeWidth: 2,
         draggable: true,
         cursors: {
@@ -81,6 +69,7 @@ function vehicle(canvas, waypoint_data, rotation_input) {
             mouseup: 'pointer'
         },
         mousedown: function (){
+            selected_robot_index = robot_index;
             rotation_input.focus();
         },
         groups: waypoint_data.groups,
@@ -95,7 +84,7 @@ function vehicle(canvas, waypoint_data, rotation_input) {
     };
 
     var forward_direction = {
-        strokeStyle: '#f44',
+        strokeStyle: '#444',
         strokeWidth: 2,
         draggable: true,
         endArrow: true,
@@ -107,6 +96,7 @@ function vehicle(canvas, waypoint_data, rotation_input) {
             mouseup: 'pointer'
         },
         mousedown: function (){
+            selected_robot_index = robot_index;
             rotation_input.focus();
         },
         groups: waypoint_data.groups,
@@ -123,13 +113,45 @@ function vehicle(canvas, waypoint_data, rotation_input) {
     canvas.drawLine(vehicle_body);
     canvas.drawLine(axis);
     canvas.drawLine(forward_direction);
+    $('canvas').drawText({
+        strokeStyle: '#ff6',
+        strokeWidth: 1,
+        groups: waypoint_data.groups,
+        dragGroups: waypoint_data.groups,
+        x: waypoint_data.position.x,
+        y: waypoint_data.position.y,
+        fontSize: 9,
+        fontFamily: 'Roboto, sans-serif',
+        text: robot_index,
+        rotate: waypoint_data.position.rotate,
+    });
 }
 
-function get_start_position(canvas) {
-    var obj = canvas.getLayerGroup('start')[0];
+function get_start_position(canvas, robot_index) {
+    var obj = canvas.getLayerGroup(create_start_name(robot_index))[0];
     return {
         x: obj.x + Math.random() * 2 - 1,
         y: obj.y + Math.random() * 2 - 1,
         rotate: obj.rotate
     };
+}
+
+function create_start_name(index){
+    return create_name('start', index);
+}
+
+function create_goal_name(index){
+    return create_name('goal', index);
+}
+
+function create_path_name(index){
+    return create_name('path', index);
+}
+
+function create_projected_name(index) {
+    return create_name('projected', index);
+}
+
+function create_name(prefix, index){
+    return prefix + index;
 }

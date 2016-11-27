@@ -1,21 +1,30 @@
+window.states = [];
+
 window.active_segment_index = 0;
 window.overrun_segment = null;
 var last_error = null;
+var filtered = 0;
 
-function step() {
+function steps() {
+    for (var i = 0; i < robot_count; i++) {
+        step(i);
+    }
+}
+
+function step(current_robot_index) {
     var canvas = $('canvas');
-    var es = canvas.getLayerGroup('start');
-    var position = get_start_position(canvas);
-    var active_segment = get_active_segment();
+    var es = canvas.getLayerGroup(create_start_name(current_robot_index));
+    var position = get_start_position(canvas, current_robot_index);
+    var active_segment = get_active_segment(current_robot_index);
 
     if (active_segment === undefined) {
-        clearInterval(window.path_follower_interval);
+        stop_following();
         return false;
     }
 
     var reverse = active_segment.orientation ? 1 : -1;
 
-    canvas.removeLayerGroup('projected');
+    canvas.removeLayerGroup(create_projected_name(current_robot_index));
 
     position.x += reverse * robot.wheelbase * Math.cos(position.rotate);
     position.y += reverse * robot.wheelbase * Math.sin(position.rotate);
@@ -35,14 +44,14 @@ function step() {
         canvas.drawEllipse({
             fillStyle: '#f00',
             layer: true,
-            groups: ['projected'],
+            groups: [create_projected_name(current_robot_index)],
             x: d.point.x, y: d.point.y,
             width: 5, height: 5
         });
         canvas.drawEllipse({
             fillStyle: '#0f0',
             layer: true,
-            groups: ['projected'],
+            groups: [create_projected_name(current_robot_index)],
             x: position.x, y: position.y,
             width: 5, height: 5
         });
@@ -63,7 +72,7 @@ function step() {
 
         var distance = Math.sqrt(Math.pow(active_segment.end.x - d.point.x, 2) + Math.pow(active_segment.end.y - d.point.y, 2));
         if (distance < 2) {
-            determine_active_segment();
+            determine_active_segment(current_robot_index);
         }
     } else if (active_segment.configIntervalType === 'ACI') {
         var projected_point = project_point_to_arc(canvas, position, active_segment);
@@ -80,7 +89,7 @@ function step() {
         canvas.drawEllipse({
             fillStyle: '#f00',
             layer: true,
-            groups: ['projected'],
+            groups: [create_projected_name(current_robot_index)],
             x: projected_point.x,
             y: projected_point.y,
             width: 5, height: 5
@@ -88,7 +97,7 @@ function step() {
         canvas.drawEllipse({
             fillStyle: '#ff0',
             layer: true,
-            groups: ['projected'],
+            groups: [create_projected_name(current_robot_index)],
             x: position.x, y: position.y,
             width: 5, height: 5
         });
@@ -99,11 +108,14 @@ function step() {
         var pos_output = 0.1 * pos_error + 0.1 * d_error;
         var aggregated_output = Math.sign(pos_output) * Math.min(Math.abs(pos_output), 0.7);
 
+        var alpha = 0.9;
+        filtered = alpha * filtered + (1 - alpha) * aggregated_output;
+
         for (var index in es) {
-            es[index].rotate += 0.5 * (1.5 * Math.tan(aggregated_output) / window.robot.wheelbase);
+            es[index].rotate += 0.5 * (1.5 * Math.tan(filtered) / window.robot.wheelbase);
             es[index].x += reverse * 1.5 * Math.cos(es[index].rotate);
             es[index].y += reverse * 1.5 * Math.sin(es[index].rotate);
-            es[index].rotate += 0.5 * (1.5 * Math.tan(aggregated_output) / window.robot.wheelbase);
+            es[index].rotate += 0.5 * (1.5 * Math.tan(filtered) / window.robot.wheelbase);
         }
         canvas.drawLayers();
 
@@ -112,15 +124,18 @@ function step() {
         var distance = Math.sqrt(Math.pow(s - projected_point.x, 2) + Math.pow(e - projected_point.y, 2));
 
         if (distance < 2) {
-            determine_active_segment();
+            determine_active_segment(current_robot_index);
         }
+    } else {
+        determine_active_segment(current_robot_index);
     }
 }
 
 function highlight_closest_point() {
     var canvas = $('canvas');
+    var current_robot_index = 0;
     var position = get_start_position(canvas);
-    var active_segment = window.path.segments[window.active_segment_index];
+    var active_segment = window.paths[current_robot_index].segments[window.active_segment_index];
     if (active_segment.configIntervalType === 'TCI') {
         var d = closest_point({
             start: {
@@ -142,7 +157,7 @@ function highlight_closest_point() {
 
         var distance = Math.sqrt(Math.pow(active_segment.end.x - d.point.x, 2) + Math.pow(active_segment.end.y - d.point.y, 2));
         if (distance < 2) {
-            determine_active_segment();
+            determine_active_segment(current_robot_index);
         }
     } else if (active_segment.configIntervalType === "ACI") {
         var correct_point = project_point_to_arc(canvas, position, active_segment);
@@ -170,8 +185,10 @@ function highlight_closest_point() {
 
         var distance = Math.sqrt(Math.pow(s - correct_point.x, 2) + Math.pow(e - correct_point.y, 2));
         if (distance < 2) {
-            determine_active_segment();
+            determine_active_segment(current_robot_index);
         }
+    } else {
+        determine_active_segment(current_robot_index);
     }
 }
 
@@ -217,8 +234,8 @@ function project_point_to_arc(canvas, position, segment) {
     }
 }
 
-function get_active_segment() {
-    var active_segment = window.path.segments[window.active_segment_index];
+function get_active_segment(robot_index) {
+    var active_segment = window.paths[robot_index].segments[window.active_segment_index];
 
     if (window.overrun_segment !== null) {
         if (active_segment.configIntervalType === 'TCI') {
@@ -324,7 +341,7 @@ function construct_overrun_from_ACI(segment) {
     return segm;
 }
 
-function determine_active_segment() {
+function determine_active_segment(robot_index) {
     last_error = null;
 
     if (window.overrun_segment !== null) {
@@ -333,12 +350,39 @@ function determine_active_segment() {
     } else {
         var next_index = window.active_segment_index + 1;
 
-        if (window.path.segments.length <= next_index) {
+        if (window.paths[robot_index].segments.length <= next_index) {
             window.overrun_segment = window.active_segment_index;
-        } else if (window.path.segments[next_index].orientation !== window.path.segments[window.active_segment_index].orientation) {
+        } else if (window.paths[robot_index].segments[next_index].orientation !== window.paths[robot_index].segments[window.active_segment_index].orientation) {
             window.overrun_segment = window.active_segment_index;
         } else {
             window.active_segment_index += 1;
         }
     }
+}
+
+function start_following() {
+    reset_state();
+    window.path_follower_interval = setInterval(steps, 30);
+    $('#start-button').unbind('click').on('click', stop_following).text('Stop');
+}
+
+function stop_following() {
+    clearInterval(window.path_follower_interval);
+    $('#start-button').unbind('click').on('click', start_following).text('Start');
+}
+
+function reset_state() {
+    window.states = [];
+    for (var i = 0; i < robot_count; i++) {
+        window.states[i] = {
+            active_segment_index: 0,
+            overrun_segment: null,
+            last_error: null,
+            filtered: 0
+        };
+    }
+    active_segment_index = 0;
+    window.overrun_segment = null;
+    last_error = null;
+    filtered = 0;
 }

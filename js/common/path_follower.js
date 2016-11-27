@@ -20,7 +20,7 @@ function step(current_robot_index) {
 
     var reverse = active_segment.orientation ? 1 : -1;
 
-    canvas.removeLayerGroup(create_projected_name(current_robot_index));
+    canvas.removeLayerGroup(create_projected_name(state.robot_index));
 
     position.x += reverse * robot.wheelbase * Math.cos(position.rotate);
     position.y += reverse * robot.wheelbase * Math.sin(position.rotate);
@@ -40,14 +40,14 @@ function step(current_robot_index) {
         canvas.drawEllipse({
             fillStyle: '#f00',
             layer: true,
-            groups: [create_projected_name(current_robot_index)],
+            groups: [create_projected_name(state.robot_indext)],
             x: d.point.x, y: d.point.y,
             width: 5, height: 5
         });
         canvas.drawEllipse({
             fillStyle: '#0f0',
             layer: true,
-            groups: [create_projected_name(current_robot_index)],
+            groups: [create_projected_name(state.robot_index)],
             x: position.x, y: position.y,
             width: 5, height: 5
         });
@@ -85,7 +85,7 @@ function step(current_robot_index) {
         canvas.drawEllipse({
             fillStyle: '#f00',
             layer: true,
-            groups: [create_projected_name(current_robot_index)],
+            groups: [create_projected_name(state.robot_index)],
             x: projected_point.x,
             y: projected_point.y,
             width: 5, height: 5
@@ -93,7 +93,7 @@ function step(current_robot_index) {
         canvas.drawEllipse({
             fillStyle: '#ff0',
             layer: true,
-            groups: [create_projected_name(current_robot_index)],
+            groups: [create_projected_name(state.robot_index)],
             x: position.x, y: position.y,
             width: 5, height: 5
         });
@@ -127,65 +127,37 @@ function step(current_robot_index) {
     }
 }
 
-function highlight_closest_point() {
+function drag_robot() {
+    var current_robot_index = 0;
     var canvas = $('canvas');
-    var state = window.states[0];
-    var position = get_start_position(canvas);
-    var active_segment = window.paths[state.robot_index].segments[state.active_segment_index];
-    if (active_segment.configIntervalType === 'TCI') {
-        var d = closest_point({
-            start: {
-                x: active_segment.start.x,
-                y: active_segment.start.y
-            }, end: {
-                x: active_segment.end.x,
-                y: active_segment.end.y
-            }
-        }, position);
-        canvas.removeLayerGroup('projected');
-        canvas.drawEllipse({
-            fillStyle: '#ff0',
-            layer: true,
-            groups: ['projected'],
-            x: d.point.x, y: d.point.y,
-            width: 5, height: 5
-        });
-
-        var distance = Math.sqrt(Math.pow(active_segment.end.x - d.point.x, 2) + Math.pow(active_segment.end.y - d.point.y, 2));
-        if (distance < 2) {
-            determine_active_segment(state);
+    var state = window.states[current_robot_index];
+    var position = get_start_position(canvas, current_robot_index);
+    var others = [];
+    for (var i=0; i<robot_count; i++) {
+        if (i !== current_robot_index) {
+            others.push(get_start_position(canvas, i));
         }
-    } else if (active_segment.configIntervalType === "ACI") {
-        var correct_point = project_point_to_arc(canvas, position, active_segment);
-
-        var center = {
-            x: active_segment.center.x,
-            y: active_segment.center.y
-        };
-
-        var sign = active_segment.direction ? 1 : -1;
-        sign *= Math.sign(Math.sqrt(distance_squared(position, center)) - active_segment.radius);
-
-        canvas.removeLayerGroup('projected');
-        canvas.drawEllipse({
-            fillStyle: '#ff0',
-            layer: true,
-            groups: ['projected'],
-            x: correct_point.x,
-            y: correct_point.y,
-            width: 5, height: 5
-        });
-
-        var s = active_segment.center.x + active_segment.radius * Math.cos(active_segment.arc_start + active_segment.delta);
-        var e = active_segment.center.y - active_segment.radius * Math.sin(active_segment.arc_start + active_segment.delta);
-
-        var distance = Math.sqrt(Math.pow(s - correct_point.x, 2) + Math.pow(e - correct_point.y, 2));
-        if (distance < 2) {
-            determine_active_segment(state);
-        }
-    } else {
-        determine_active_segment(state);
     }
+    var angle = -position.rotate;
+
+    canvas.removeLayerGroup(create_line_name(state.robot_index));
+    for (var i in others){
+        var obj = others[i];
+        console.log(obj.x + ' ; ' + obj.y + ' @ ' + (-obj.rotate));
+
+        canvas.drawLine({
+            strokeStyle: '#f44',
+            strokeWidth: 1,
+            layer: true,
+            groups: [create_line_name(state.robot_index)],
+            x1: position.x,
+            y1: position.y,
+            x2: obj.x1,
+            y2: obj.y1
+        });
+    }
+
+        canvas.drawLayers();
 }
 
 function project_point_to_arc(canvas, position, segment) {
@@ -235,16 +207,16 @@ function get_active_segment(state) {
 
     if (state.overrun_segment !== null) {
         if (active_segment.configIntervalType === 'TCI') {
-            return construct_overrun_from_TCI(active_segment);
+            return construct_overrun_from_TCI(active_segment, state);
         } else {
-            return construct_overrun_from_ACI(active_segment);
+            return construct_overrun_from_ACI(active_segment, state);
         }
     } else {
         return active_segment;
     }
 }
 
-function construct_overrun_from_TCI(segment) {
+function construct_overrun_from_TCI(segment, state) {
     canvas = $('canvas');
     var start = {x: segment.start.x, y: segment.start.y};
     var end = {x: segment.end.x, y: segment.end.y};
@@ -268,7 +240,7 @@ function construct_overrun_from_TCI(segment) {
         end: new_end
     };
 
-    canvas.removeLayerGroup('segm');
+    canvas.removeLayerGroup(create_segment_name(state.robot_index));
     canvas.drawLine({
         strokeStyle: '#f44',
         strokeWidth: 1,
@@ -276,7 +248,7 @@ function construct_overrun_from_TCI(segment) {
         endArrow: true,
         arrowRadius: 7,
         arrowAngle: 1,
-        groups: ['segm'],
+        groups: [create_segment_name(state.robot_index)],
         x1: segm.start.x,
         y1: segm.start.y,
         x2: segm.end.x,
@@ -287,7 +259,7 @@ function construct_overrun_from_TCI(segment) {
     return segm;
 }
 
-function construct_overrun_from_ACI(segment) {
+function construct_overrun_from_ACI(segment, state) {
     var multiplier = segment.direction ? -1 : 1;
     var a = multiplier * (segment.arc_start + segment.delta);
     var end_point = {
@@ -318,7 +290,7 @@ function construct_overrun_from_ACI(segment) {
         end: new_end
     };
 
-    canvas.removeLayerGroup('segm');
+    canvas.removeLayerGroup(create_segment_name(state.robot_index));
     canvas.drawLine({
         strokeStyle: '#f44',
         strokeWidth: 1,
@@ -326,7 +298,7 @@ function construct_overrun_from_ACI(segment) {
         endArrow: true,
         arrowRadius: 7,
         arrowAngle: 1,
-        groups: ['segm'],
+        groups: [create_segment_name(state.robot_index)],
         x1: segm.start.x,
         y1: segm.start.y,
         x2: segm.end.x,

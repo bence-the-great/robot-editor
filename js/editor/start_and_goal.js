@@ -42,7 +42,7 @@ function vehicle(canvas, waypoint_data, rotation_input, robot_index) {
             mouseup: 'pointer'
         },
         drag: function (){
-            highlight_closest_point();
+            drag_robot();
         },
         mousedown: function (){
             selected_robot_index = robot_index;
@@ -132,6 +132,14 @@ function get_start_position(canvas, robot_index) {
     return {
         x: obj.x + Math.random() * 2 - 1,
         y: obj.y + Math.random() * 2 - 1,
+        x1: obj.x1,
+        y1: obj.y1,
+        x2: obj.x2,
+        y2: obj.y2,
+        x3: obj.x3,
+        y3: obj.y3,
+        x4: obj.x4,
+        y4: obj.y4,
         rotate: obj.rotate
     };
 }
@@ -150,6 +158,14 @@ function create_path_name(index){
 
 function create_projected_name(index) {
     return create_name('projected', index);
+}
+
+function create_segment_name(index) {
+    return create_name('segm', index);
+}
+
+function create_line_name(index) {
+    return create_name('line', index);
 }
 
 function create_name(prefix, index){

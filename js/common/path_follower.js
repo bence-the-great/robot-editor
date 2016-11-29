@@ -40,7 +40,7 @@ function step(current_robot_index) {
         canvas.drawEllipse({
             fillStyle: '#f00',
             layer: true,
-            groups: [create_projected_name(state.robot_indext)],
+            groups: [create_projected_name(state.robot_index)],
             x: d.point.x, y: d.point.y,
             width: 5, height: 5
         });

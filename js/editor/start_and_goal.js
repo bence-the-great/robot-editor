@@ -123,8 +123,17 @@ function vehicle(canvas, waypoint_data, rotation_input, robot_index) {
         fontSize: 9,
         fontFamily: 'Roboto, sans-serif',
         text: robot_index,
-        rotate: waypoint_data.position.rotate,
+        rotate: waypoint_data.position.rotate
     });
+}
+
+function get_line_sensor_position(canvas, robot_index, wheelbase, reverse){
+    position = get_start_position(canvas, robot_index);
+
+    position.x += reverse * wheelbase * Math.cos(position.rotate);
+    position.y += reverse * wheelbase * Math.sin(position.rotate);
+
+    return position;
 }
 
 function get_start_position(canvas, robot_index) {

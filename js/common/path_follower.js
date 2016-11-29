@@ -1,8 +1,9 @@
 window.states = [];
+window.running = [];
 
 function steps() {
-    for (var i = 0; i < robot_count; i++) {
-        step(i);
+    for (var i in window.running) {
+        step(window.running[i]);
     }
 }
 
@@ -11,15 +12,16 @@ function step(current_robot_index) {
     var state = window.states[current_robot_index];
     var es = canvas.getLayerGroup(create_start_name(current_robot_index));
     var active_segment = get_active_segment(state);
+    if (active_segment === undefined) {
+        stop_following(current_robot_index);
+        return false;
+    }
     var reverse = active_segment.orientation ? 1 : -1;
     var position = get_line_sensor_position(canvas, current_robot_index, robot.wheelbase, reverse);
 
-    if (active_segment === undefined) {
-        stop_following();
-        return false;
-    }
-
     canvas.removeLayerGroup(create_projected_name(state.robot_index));
+
+    var v = is_robot_close_to_others(current_robot_index) ? 0 : 1.5;
 
     if (active_segment.configIntervalType === 'TCI') {
         var d = closest_point({
@@ -55,10 +57,10 @@ function step(current_robot_index) {
         var aggregated_output = Math.sign(pos_output) * Math.min(Math.abs(pos_output), 0.5);
 
         for (var index in es) {
-            es[index].rotate += 0.5 * (1.5 * Math.tan(aggregated_output) / window.robot.wheelbase);
-            es[index].x += reverse * 1.5 * Math.cos(es[index].rotate);
-            es[index].y += reverse * 1.5 * Math.sin(es[index].rotate);
-            es[index].rotate += 0.5 * (1.5 * Math.tan(aggregated_output) / window.robot.wheelbase);
+            es[index].rotate += 0.5 * (v * Math.tan(aggregated_output) / window.robot.wheelbase);
+            es[index].x += reverse * v * Math.cos(es[index].rotate);
+            es[index].y += reverse * v * Math.sin(es[index].rotate);
+            es[index].rotate += 0.5 * (v * Math.tan(aggregated_output) / window.robot.wheelbase);
         }
         canvas.drawLayers();
 
@@ -104,10 +106,10 @@ function step(current_robot_index) {
         state.filtered = alpha * state.filtered + (1 - alpha) * aggregated_output;
 
         for (var index in es) {
-            es[index].rotate += 0.5 * (1.5 * Math.tan(state.filtered) / window.robot.wheelbase);
-            es[index].x += reverse * 1.5 * Math.cos(es[index].rotate);
-            es[index].y += reverse * 1.5 * Math.sin(es[index].rotate);
-            es[index].rotate += 0.5 * (1.5 * Math.tan(state.filtered) / window.robot.wheelbase);
+            es[index].rotate += 0.5 * (v * Math.tan(state.filtered) / window.robot.wheelbase);
+            es[index].x += reverse * v * Math.cos(es[index].rotate);
+            es[index].y += reverse * v * Math.sin(es[index].rotate);
+            es[index].rotate += 0.5 * (v * Math.tan(state.filtered) / window.robot.wheelbase);
         }
         canvas.drawLayers();
 
@@ -146,12 +148,12 @@ function drag_robot() {
         opacity: 0.5,
         layer: true,
         groups: [create_line_name(state.robot_index)],
-        x1: position.x + allowed_distance * Math.cos(angle + 0.6),
-        y1: position.y + allowed_distance * Math.sin(angle + 0.6),
+        x1: position.x + allowed_distance * Math.cos(-angle + 0.6),
+        y1: position.y + allowed_distance * Math.sin(-angle + 0.6),
         x2: position.x,
         y2: position.y,
-        x3: position.x + allowed_distance * Math.cos(angle - 0.6),
-        y3: position.y + allowed_distance * Math.sin(angle - 0.6)
+        x3: position.x + allowed_distance * Math.cos(-angle - 0.6),
+        y3: position.y + allowed_distance * Math.sin(-angle - 0.6)
     });
 
     for (var i in others){
@@ -161,7 +163,8 @@ function drag_robot() {
                 x:obj.x + obj['x'+j],
                 y:obj.y + obj['y'+j]
             };
-            var line_angle = Math.atan2(other_position.y-position.y, other_position.x-position.x);
+            var line_angle = -Math.atan2(other_position.y-position.y, other_position.x-position.x) - angle;
+            console.log(-Math.atan2(other_position.y-position.y, other_position.x-position.x) + ' - ' + angle + ' = ' + line_angle);
             var is_close = Math.abs(line_angle) < 0.6 && Math.sqrt(distance_squared(other_position, position)) < allowed_distance;
             canvas.drawLine({
                 strokeStyle: is_close ? '#4f4' : '#f44',
@@ -350,10 +353,22 @@ function determine_active_segment(state) {
 function start_following() {
     reset_state();
     window.path_follower_interval = setInterval(steps, 30);
-    $('#start-button').unbind('click').on('click', stop_following).text('Stop');
+    $('#start-button').unbind('click').on('click', stop_all).text('Stop');
 }
 
-function stop_following() {
+function stop_following(robot_index) {
+    var index = window.running.indexOf(robot_index);
+    if (index > -1) {
+        window.running.splice(index, 1);
+    }
+    if (window.running.length <= 0) {
+        clearInterval(window.path_follower_interval);
+        $('#start-button').unbind('click').on('click', start_following).text('Start');
+    }
+}
+
+function stop_all(){
+    window.running = [];
     clearInterval(window.path_follower_interval);
     $('#start-button').unbind('click').on('click', start_following).text('Start');
 }
@@ -368,9 +383,45 @@ function reset_state() {
             last_error: null,
             filtered: 0
         };
+        window.running.push(i);
     }
 }
 
-function robot_close_to_other(){
+function is_robot_close_to_others(robot_index){
+    var canvas = $('canvas');
+    var allowed_distance = 200;
+    var position = get_line_sensor_position(canvas, robot_index, robot.wheelbase, 1);
+    var others = [];
+    for (var i=0; i<robot_count; i++) {
+        if (i !== robot_index) {
+            others.push(get_start_position(canvas, i));
+        }
+    }
+    canvas.removeLayerGroup(create_line_name(robot_index));
 
+    for (var i in others){
+        var obj = others[i];
+        for (var j = 1; j < 5; j++) {
+            var other_position = {
+                x:obj.x + obj['x'+j],
+                y:obj.y + obj['y'+j]
+            };
+            var line_angle = Math.atan2(other_position.y-position.y, other_position.x-position.x);
+            var is_close = Math.abs(line_angle) < 0.6 && Math.sqrt(distance_squared(other_position, position)) < allowed_distance;
+            canvas.drawLine({
+                strokeStyle: is_close ? '#f44' : '#4f4',
+                strokeWidth: 1,
+                layer: true,
+                groups: [create_line_name(robot_index)],
+                x1: position.x,
+                y1: position.y,
+                x2: other_position.x,
+                y2: other_position.y
+            });
+            if (is_close) {
+                return true;
+            }
+        }
+    }
+    return false;
 }

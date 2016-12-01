@@ -352,7 +352,7 @@ function determine_active_segment(state) {
 
 function start_following() {
     reset_state();
-    window.path_follower_interval = setInterval(steps, 90);
+    window.path_follower_interval = setInterval(steps, 30);
     $('#start-button').unbind('click').on('click', stop_all).text('Stop');
 }
 

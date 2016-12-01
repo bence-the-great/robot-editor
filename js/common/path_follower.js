@@ -136,7 +136,7 @@ function drag_robot() {
             others.push(get_start_position(canvas, i));
         }
     }
-    var angle = -position.rotate;
+    var angle = corrigate_angle2(-position.rotate);
     var allowed_distance = 200;
 
     canvas.removeLayerGroup(create_line_name(state.robot_index));
@@ -163,8 +163,8 @@ function drag_robot() {
                 x:obj.x + obj['x'+j],
                 y:obj.y + obj['y'+j]
             };
-            var line_angle = -Math.atan2(other_position.y-position.y, other_position.x-position.x) - angle;
-            console.log(-Math.atan2(other_position.y-position.y, other_position.x-position.x) + ' - ' + angle + ' = ' + line_angle);
+            var line_angle = corrigate_angle(corrigate_angle2(-Math.atan2(other_position.y-position.y, other_position.x-position.x)) - angle);
+            console.log(corrigate_angle2(-Math.atan2(other_position.y-position.y, other_position.x-position.x)) + ' - ' + angle + ' = ' + line_angle);
             var is_close = Math.abs(line_angle) < 0.6 && Math.sqrt(distance_squared(other_position, position)) < allowed_distance;
             canvas.drawLine({
                 strokeStyle: is_close ? '#4f4' : '#f44',

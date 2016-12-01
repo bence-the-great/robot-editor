@@ -398,7 +398,6 @@ function is_robot_close_to_others(robot_index){
             others.push(get_start_position(canvas, i));
         }
     }
-    canvas.removeLayerGroup(create_line_name(robot_index));
 
     for (var i in others){
         var obj = others[i];
@@ -409,16 +408,6 @@ function is_robot_close_to_others(robot_index){
             };
             var line_angle = corrigate_angle(corrigate_angle2(-Math.atan2(other_position.y-position.y, other_position.x-position.x)) - angle);
             var is_close = Math.abs(line_angle) < 0.6 && Math.sqrt(distance_squared(other_position, position)) < allowed_distance;
-            canvas.drawLine({
-                strokeStyle: is_close ? '#f44' : '#4f4',
-                strokeWidth: 1,
-                layer: true,
-                groups: [create_line_name(robot_index)],
-                x1: position.x,
-                y1: position.y,
-                x2: other_position.x,
-                y2: other_position.y
-            });
             if (is_close) {
                 return true;
             }

@@ -51,31 +51,47 @@ $(function () {
 
 function circle_circle(canvas){
     var circle1 = {
-        x: 750,
-        y: 400,
-        radius: 50
+        center: {
+            x: 750,
+            y: 400
+        },
+        radius: 50,
+        arc_start: -1.2,
+        delta: 5.77,
+        direction: true
     };
     var circle2 = {
-        x: 800,
-        y: 450,
-        radius: 95
+        center:{
+            x: 800,
+            y: 450
+        },
+        radius: 95,
+        arc_start: -1.2,
+        delta: -2.77,
+        direction: false
     };
-    canvas.drawEllipse({
+    canvas.drawArc({
         strokeStyle: '#000',
         layer: true,
-        x: circle1.x,
-        y: circle1.y,
-        width: circle1.radius*2, height: circle1.radius*2
+        x: circle1.center.x,
+        y: circle1.center.y,
+        radius: circle1.radius,
+        start: 1.57079633 - circle1.arc_start,
+        end: 1.57079633 - (circle1.arc_start + circle1.delta),
+        ccw: circle1.direction
     });
-    canvas.drawEllipse({
+    canvas.drawArc({
         strokeStyle: '#000',
         layer: true,
-        x: circle2.x,
-        y: circle2.y,
-        width: circle2.radius*2, height: circle2.radius*2
+        x: circle2.center.x,
+        y: circle2.center.y,
+        radius: circle2.radius,
+        start: 1.57079633 - circle2.arc_start,
+        end: 1.57079633 - (circle2.arc_start + circle2.delta),
+        ccw: circle2.direction
     });
 
-    var d = Math.sqrt(distance_squared(circle1, circle2));
+    var d = Math.sqrt(distance_squared(circle1.center, circle2.center));
 
     console.log(d + ' || ' + (circle1.radius + circle2.radius));
 
@@ -90,16 +106,22 @@ function circle_circle(canvas){
     }
 
     var x = (Math.pow(d, 2) - Math.pow(circle2.radius, 2) + Math.pow(circle1.radius, 2)) / (2 * d);
-    var angle = Math.atan2(circle2.y-circle1.y,circle2.x-circle1.x);
+    var angle = Math.atan2(circle2.center.y-circle1.center.y,circle2.center.x-circle1.center.x);
 
     if (Math.abs(d - Math.abs(circle1.radius - circle2.radius)) < 1) {
-        canvas.drawEllipse({
-            strokeStyle: '#00f',
-            layer: true,
-            x: circle1.x + Math.cos(angle) * x,
-            y: circle1.y + Math.sin(angle) * x,
-            width: 5, height: 5
-        });
+        var result = {
+            x: circle1.center.x + Math.cos(angle) * x,
+            y: circle1.center.y + Math.sin(angle) * x
+        };
+        if(between(result, circle1) && between(result, circle2)) {
+            canvas.drawEllipse({
+                strokeStyle: '#00f',
+                layer: true,
+                x: result.x,
+                y: result.y,
+                width: 5, height: 5
+            });
+        }
     } else {
         var a1 = -d + circle2.radius - circle1.radius;
         var a2 = -d - circle2.radius + circle1.radius;
@@ -107,23 +129,35 @@ function circle_circle(canvas){
         var a4 = d + circle2.radius + circle1.radius;
         var a = Math.sqrt(a1 * a2 * a3 * a4) / d;
 
+        var result1 = {
+            x: (circle1.center.x + Math.cos(angle) * x) + Math.cos(angle + Math.PI / 2) * a / 2,
+            y: (circle1.center.y + Math.sin(angle) * x) + Math.sin(angle + Math.PI / 2) * a / 2
+        };
+        var result2 = {
+            x: (circle1.center.x + Math.cos(angle) * x) - Math.cos(angle + Math.PI / 2) * a / 2,
+            y: (circle1.center.y + Math.sin(angle) * x) - Math.sin(angle + Math.PI / 2) * a / 2
+        };
 
-        canvas.drawEllipse({
-            fillStyle: '#ff0',
-            opacity: 0.5,
-            layer: true,
-            x: (circle1.x + Math.cos(angle) * x) + Math.cos(angle + Math.PI / 2) * a / 2,
-            y: (circle1.y + Math.sin(angle) * x) + Math.sin(angle + Math.PI / 2) * a / 2,
-            width: 100, height: 100
-        });
-        canvas.drawEllipse({
-            fillStyle: '#ff0',
-            opacity: 0.5,
-            layer: true,
-            x: (circle1.x + Math.cos(angle) * x) - Math.cos(angle + Math.PI / 2) * a / 2,
-            y: (circle1.y + Math.sin(angle) * x) - Math.sin(angle + Math.PI / 2) * a / 2,
-            width: 100, height: 100
-        });
+        if(between(result1, circle1) && between(result1, circle2)) {
+            canvas.drawEllipse({
+                fillStyle: '#ff0',
+                opacity: 0.5,
+                layer: true,
+                x: result1.x,
+                y: result1.y,
+                width: 100, height: 100
+            });
+        }
+        if(between(result2, circle1) && between(result2, circle2)) {
+            canvas.drawEllipse({
+                fillStyle: '#ff0',
+                opacity: 0.5,
+                layer: true,
+                x: result2.x,
+                y: result2.y,
+                width: 100, height: 100
+            });
+        }
     }
 }
 
@@ -163,7 +197,7 @@ function line_circle(canvas){
         radius: arc.radius,
         start: 1.57079633 - arc.arc_start,
         end: 1.57079633 - (arc.arc_start + arc.delta),
-        ccw: true
+        ccw: arc.direction
     });
 
     var aa = {

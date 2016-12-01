@@ -391,6 +391,7 @@ function is_robot_close_to_others(robot_index){
     var canvas = $('canvas');
     var allowed_distance = 200;
     var position = get_line_sensor_position(canvas, robot_index, robot.wheelbase, 1);
+    var angle = corrigate_angle2(-position.rotate);
     var others = [];
     for (var i=0; i<robot_count; i++) {
         if (i !== robot_index) {
@@ -406,7 +407,7 @@ function is_robot_close_to_others(robot_index){
                 x:obj.x + obj['x'+j],
                 y:obj.y + obj['y'+j]
             };
-            var line_angle = Math.atan2(other_position.y-position.y, other_position.x-position.x);
+            var line_angle = corrigate_angle(corrigate_angle2(-Math.atan2(other_position.y-position.y, other_position.x-position.x)) - angle);
             var is_close = Math.abs(line_angle) < 0.6 && Math.sqrt(distance_squared(other_position, position)) < allowed_distance;
             canvas.drawLine({
                 strokeStyle: is_close ? '#f44' : '#4f4',

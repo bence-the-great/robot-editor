@@ -57,6 +57,8 @@ function publish_scene(index) {
         y: canvas.height() - goal.y,
         phi: goal.rotate * -1
     };
+    console.log('index ' + index);
+    console.log(scene);
     window.publisher.publish(new ROSLIB.Message(scene));
 }
 

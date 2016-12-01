@@ -128,10 +128,15 @@ function circle_circle(canvas){
 }
 
 function line_circle(canvas){
-    var circle = {
-        x: 650,
-        y: 250,
-        radius: 50
+    var arc = {
+        center:{
+            x: 650,
+            y: 250
+        },
+        radius: 50,
+        arc_start: -1.2,
+        delta: 5.77,
+        direction: true
     };
     var a = {
         x: 600,
@@ -139,7 +144,7 @@ function line_circle(canvas){
     };
     var b = {
         x: 700,
-        y: 300
+        y: 270
     };
     canvas.drawLine({
         strokeStyle: '#000',
@@ -150,75 +155,88 @@ function line_circle(canvas){
         x2: b.x,
         y2: b.y
     });
-    canvas.drawEllipse({
+    canvas.drawArc({
         strokeStyle: '#000',
         layer: true,
-        x: circle.x,
-        y: circle.y,
-        width: circle.radius * 2, height: circle.radius * 2
+        x: arc.center.x,
+        y: arc.center.y,
+        radius: arc.radius,
+        start: 1.57079633 - arc.arc_start,
+        end: 1.57079633 - (arc.arc_start + arc.delta),
+        ccw: true
     });
 
     var aa = {
-        x: a.x - circle.x,
-        y: a.y - circle.y
+        x: a.x - arc.center.x,
+        y: a.y - arc.center.y
     };
     var bb = {
-        x: b.x - circle.x,
-        y: b.y - circle.y
+        x: b.x - arc.center.x,
+        y: b.y - arc.center.y
     };
 
     var d = subtract(bb,aa);
     var length = Math.sqrt(distance_squared(aa,bb));
     var D = (aa.x * bb.y) - (bb.x * aa.y);
-    var discriminant = Math.pow(circle.radius, 2) * Math.pow(length, 2) - Math.pow(D, 2);
+    var discriminant = Math.pow(arc.radius, 2) * Math.pow(length, 2) - Math.pow(D, 2);
 
     console.log('discriminant: ' + discriminant);
     if (discriminant < 0){
         console.log('no intersection');
+        return false;
     } else if (discriminant === 0){
         console.log('tangent');
         var asd = Math.sign(d.y) * d.x * Math.sqrt(discriminant);
         var asd2 = Math.abs(d.y) * Math.sqrt(discriminant);
         var result = {
-            x: (D * d.y + asd) / Math.pow(length, 2),
-            y: (-D * d.x + asd2) / Math.pow(length, 2)
+            x: arc.center.x + (D * d.y + asd) / Math.pow(length, 2),
+            y: arc.center.y + (-D * d.x + asd2) / Math.pow(length, 2)
         };
-        canvas.drawEllipse({
-            fillStyle: '#ff0',
-            opacity: 0.5,
-            layer: true,
-            x: circle.x + result.x,
-            y: circle.y + result.y,
-            width: 100, height: 100
-        });
+        if(between(result, arc)) {
+            canvas.drawEllipse({
+                fillStyle: '#ff0',
+                opacity: 0.5,
+                layer: true,
+                x: result.x,
+                y: result.y,
+                width: 100, height: 100
+            });
+        } else {
+            return false;
+        }
+
     } else {
         console.log('intersect');
         var asd = Math.sign(d.y) * d.x * Math.sqrt(discriminant);
         var asd2 = Math.abs(d.y) * Math.sqrt(discriminant);
         var result_1 = {
-            x: (D * d.y + asd) / Math.pow(length, 2),
-            y: (-D * d.x + asd2) / Math.pow(length, 2)
+            x: arc.center.x + (D * d.y + asd) / Math.pow(length, 2),
+            y: arc.center.y + (-D * d.x + asd2) / Math.pow(length, 2)
         };
         var result_2 = {
-            x: (D * d.y - asd) / Math.pow(length, 2),
-            y: (-D * d.x - asd2) / Math.pow(length, 2)
+            x: arc.center.x +(D * d.y - asd) / Math.pow(length, 2),
+            y: arc.center.y +(-D * d.x - asd2) / Math.pow(length, 2)
         };
-        canvas.drawEllipse({
-            fillStyle: '#ff0',
-            opacity: 0.5,
-            layer: true,
-            x: circle.x + result_1.x,
-            y: circle.y + result_1.y,
-            width: 100, height: 100
-        });
-        canvas.drawEllipse({
-            fillStyle: '#ff0',
-            opacity: 0.5,
-            layer: true,
-            x: circle.x + result_2.x,
-            y: circle.y + result_2.y,
-            width: 100, height: 100
-        });
+        if(between(result_1, arc)) {
+            canvas.drawEllipse({
+                fillStyle: '#ff0',
+                opacity: 0.5,
+                layer: true,
+                x: result_1.x,
+                y: result_1.y,
+                width: 100, height: 100
+            });
+        }
+        if (between(result_2, arc)) {
+            canvas.drawEllipse({
+                fillStyle: '#ff0',
+                opacity: 0.5,
+                layer: true,
+                x: result_2.x,
+                y: result_2.y,
+                width: 100, height: 100
+            });
+        }
     }
 }
 
@@ -282,5 +300,21 @@ function line_line(canvas){
             y: y,
             width: 100, height: 100
         });
+    }
+}
+
+function between(position, segment){
+    var angle = corrigate_angle2(Math.atan2((-position.y) - (-segment.center.y), position.x - segment.center.x));
+    var point = {
+        x: segment.center.x + segment.radius * Math.cos(angle),
+        y: segment.center.y - segment.radius * Math.sin(angle)
+    };
+    var distance_from_start = corrigate_angle2(Math.atan2((-point.y) - (-segment.center.y), point.x - segment.center.x) - segment.arc_start);
+
+    var is_between = false;
+    if (segment.direction) {  // ccw
+        return Math.abs(distance_from_start) <= Math.abs(segment.delta);
+    } else {  // cw
+        return Math.abs(distance_from_start) >= (2 * Math.PI - Math.abs(segment.delta));
     }
 }

@@ -21,7 +21,7 @@ function step(current_robot_index) {
 
     canvas.removeLayerGroup(create_projected_name(state.robot_index));
 
-    var v = is_robot_close_to_others(current_robot_index) ? 0 : 1.5;
+    var v = is_robot_close_to_others(current_robot_index, reverse) ? 0 : 1.5;
 
     if (active_segment.configIntervalType === 'TCI') {
         var d = closest_point({
@@ -352,7 +352,7 @@ function determine_active_segment(state) {
 
 function start_following() {
     reset_state();
-    window.path_follower_interval = setInterval(steps, 30);
+    window.path_follower_interval = setInterval(steps, 90);
     $('#start-button').unbind('click').on('click', stop_all).text('Stop');
 }
 
@@ -387,11 +387,11 @@ function reset_state() {
     }
 }
 
-function is_robot_close_to_others(robot_index){
+function is_robot_close_to_others(robot_index, reverse){
     var canvas = $('canvas');
-    var allowed_distance = 200;
-    var position = get_line_sensor_position(canvas, robot_index, robot.wheelbase, 1);
-    var angle = corrigate_angle2(-position.rotate);
+    var allowed_distance = 150;
+    var position = get_line_sensor_position(canvas, robot_index, robot.wheelbase, reverse);
+    var angle = corrigate_angle2(-position.rotate - Math.PI/2 + (Math.PI/2) * reverse);
     var others = [];
     for (var i=0; i<robot_count; i++) {
         if (i !== robot_index) {
@@ -399,15 +399,29 @@ function is_robot_close_to_others(robot_index){
         }
     }
 
+    canvas.removeLayerGroup(create_line_name(robot_index));
+
     for (var i in others){
         var obj = others[i];
         for (var j = 1; j < 5; j++) {
             var other_position = {
-                x:obj.x + obj['x'+j],
-                y:obj.y + obj['y'+j]
+                x:obj.x + Math.cos(obj.rotate) * obj['x'+j] - Math.sin(obj.rotate) * obj['y'+j],
+                y:obj.y + Math.sin(obj.rotate) * obj['x'+j] + Math.cos(obj.rotate) * obj['y'+j]
             };
             var line_angle = corrigate_angle(corrigate_angle2(-Math.atan2(other_position.y-position.y, other_position.x-position.x)) - angle);
             var is_close = Math.abs(line_angle) < 0.6 && Math.sqrt(distance_squared(other_position, position)) < allowed_distance;
+
+            canvas.drawLine({
+                strokeStyle: is_close ? '#f44' : '#4f4',
+                strokeWidth: 1,
+                layer: true,
+                groups: [create_line_name(robot_index)],
+                x1: position.x,
+                y1: position.y,
+                x2: other_position.x,
+                y2: other_position.y
+            });
+
             if (is_close) {
                 return true;
             }

@@ -43,9 +43,9 @@ $(function () {
         add_start_and_goal(canvas, robot_count);
     });
 
-    line_line(canvas);
+    // line_line(canvas);
     // line_circle(canvas);
-    circle_circle(canvas);
+    // circle_circle(canvas);
 
 });
 
@@ -176,7 +176,7 @@ function line_circle(canvas){
 
 function line_line(canvas){
     var a = {
-        x: 300,
+        x: 320,
         y: 300
     };
     var b = {
@@ -222,7 +222,7 @@ function line_line(canvas){
 
     if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
         var angle = Math.atan2(b.y - a.y, b.x - a.x);
-        var x = a.x + s * Math.sqrt(distance_squared(a, b)) * Math.cos(angle);
+        var x = a.x + t * Math.sqrt(distance_squared(a, b)) * Math.cos(angle);
         var y = a.y - t * Math.sqrt(distance_squared(a, b)) * Math.sin(-angle);
 
         console.log(s + " " + t);

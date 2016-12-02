@@ -20,13 +20,7 @@ function circle_circle(canvas, circle1, circle2) {
             y: circle1.center.y + Math.sin(angle) * x
         };
         if (between(result, circle1) && between(result, circle2)) {
-            canvas.drawEllipse({
-                strokeStyle: '#00f',
-                layer: true,
-                x: result.x,
-                y: result.y,
-                width: 5, height: 5
-            });
+            return [result];
         }
     } else {
         var a1 = -d + circle2.radius - circle1.radius;
@@ -43,38 +37,25 @@ function circle_circle(canvas, circle1, circle2) {
             x: (circle1.center.x + Math.cos(angle) * x) - Math.cos(angle + Math.PI / 2) * a / 2,
             y: (circle1.center.y + Math.sin(angle) * x) - Math.sin(angle + Math.PI / 2) * a / 2
         };
-
+        var results = [];
         if (between(result1, circle1) && between(result1, circle2)) {
-            canvas.drawEllipse({
-                fillStyle: '#ff0',
-                opacity: 0.5,
-                layer: true,
-                x: result1.x,
-                y: result1.y,
-                width: 100, height: 100
-            });
+            results.push(result1);
         }
         if (between(result2, circle1) && between(result2, circle2)) {
-            canvas.drawEllipse({
-                fillStyle: '#ff0',
-                opacity: 0.5,
-                layer: true,
-                x: result2.x,
-                y: result2.y,
-                width: 100, height: 100
-            });
+            results.push(result2);
         }
+        return results;
     }
 }
 
-function line_circle(canvas, arc, a, b) {
+function line_circle(canvas, line, arc) {
     var aa = {
-        x: a.x - arc.center.x,
-        y: a.y - arc.center.y
+        x: line.start.x - arc.center.x,
+        y: line.start.y - arc.center.y
     };
     var bb = {
-        x: b.x - arc.center.x,
-        y: b.y - arc.center.y
+        x: line.end.x - arc.center.x,
+        y: line.end.y - arc.center.y
     };
 
     var d = subtract(bb, aa);
@@ -95,14 +76,7 @@ function line_circle(canvas, arc, a, b) {
             y: arc.center.y + (-D * d.x + asd2) / Math.pow(length, 2)
         };
         if (between(result, arc)) {
-            canvas.drawEllipse({
-                fillStyle: '#ff0',
-                opacity: 0.5,
-                layer: true,
-                x: result.x,
-                y: result.y,
-                width: 100, height: 100
-            });
+            return [result];
         } else {
             return false;
         }
@@ -119,26 +93,14 @@ function line_circle(canvas, arc, a, b) {
             x: arc.center.x + (D * d.y - asd) / Math.pow(length, 2),
             y: arc.center.y + (-D * d.x - asd2) / Math.pow(length, 2)
         };
+        var results = [];
         if (between(result_1, arc)) {
-            canvas.drawEllipse({
-                fillStyle: '#ff0',
-                opacity: 0.5,
-                layer: true,
-                x: result_1.x,
-                y: result_1.y,
-                width: 100, height: 100
-            });
+            results.push(result_1);
         }
         if (between(result_2, arc)) {
-            canvas.drawEllipse({
-                fillStyle: '#ff0',
-                opacity: 0.5,
-                layer: true,
-                x: result_2.x,
-                y: result_2.y,
-                width: 100, height: 100
-            });
+            results.push(result_2);
         }
+        return results;
     }
 }
 
@@ -180,137 +142,316 @@ function between(position, segment) {
 }
 
 function test_data(canvas) {
-    var circle1 = {
-        center: {
-            x: 750,
-            y: 400
-        },
-        radius: 50,
-        arc_start: -1.2,
-        delta: 5.77,
-        direction: true
-    };
-    var circle2 = {
-        center: {
-            x: 800,
-            y: 450
-        },
-        radius: 95,
-        arc_start: -1.2,
-        delta: -2.77,
-        direction: false
-    };
-    canvas.drawArc({
-        strokeStyle: '#000',
-        layer: true,
-        x: circle1.center.x,
-        y: circle1.center.y,
-        radius: circle1.radius,
-        start: 1.57079633 - circle1.arc_start,
-        end: 1.57079633 - (circle1.arc_start + circle1.delta),
-        ccw: circle1.direction
-    });
-    canvas.drawArc({
-        strokeStyle: '#000',
-        layer: true,
-        x: circle2.center.x,
-        y: circle2.center.y,
-        radius: circle2.radius,
-        start: 1.57079633 - circle2.arc_start,
-        end: 1.57079633 - (circle2.arc_start + circle2.delta),
-        ccw: circle2.direction
-    });
-    circle_circle(canvas, circle1, circle2);
+    window.paths = [{
+        segments: [
+            {
+                configIntervalType: "TCI",
+                arc_start: 0,
+                delta: 0,
+                direction: true,
+                orientation: true,
+                radius: 0,
+                center: {x: 0, y: 0},
+                start: {x: 70, y: 150},
+                end: {x: 160, y: 160}
+            },
+            {
+                configIntervalType: "ACI",
+                arc_start: 1.57,
+                delta: 3.14,
+                direction: true,
+                orientation: false,
+                radius: 40,
+                center: {x: 160, y: 200},
+                start: {x: 0, y: 0},
+                end: {x: 0, y: 0}
+            },
+            {
+                configIntervalType: "TCI",
+                arc_start: 0,
+                delta: 0,
+                direction: true,
+                orientation: false,
+                radius: 0,
+                center: {x: 0, y: 0},
+                start: {x: 160, y: 240},
+                end: {x: 200, y: 240}
+            },
+            {
+                configIntervalType: "ACI",
+                arc_start: 1.57,
+                delta: 3.14,
+                direction: true,
+                orientation: true,
+                radius: 40,
+                center: {x: 200, y: 280},
+                start: {x: 0, y: 0},
+                end: {x: 0, y: 0}
+            },
+            {
+                configIntervalType: "ACI",
+                arc_start: 1.57,
+                delta: -1.12,
+                direction: false,
+                orientation: true,
+                radius: 40,
+                center: {x: 200, y: 360},
+                start: {x: 0, y: 0},
+                end: {x: 0, y: 0}
+            }
+        ]
+    }, {
+        segments: [{
+            configIntervalType: "TCI",
+            arc_start: 0,
+            delta: 0,
+            direction: true,
+            orientation: true,
+            radius: 0,
+            center: {x: 0, y: 0},
+            start: {x: 70, y: 100},
+            end: {x: 240, y: 360}
+        }]
+    }];
 
-    var line1 = {
-        start: {
-            x: 320,
-            y: 300
-        },
-        end: {
-            x: 400,
-            y: 200
+    for (var i in window.paths) {
+        var path = window.paths[i];
+        for (var index in path.segments) {
+            var segment = path.segments[index];
+            if (segment.configIntervalType === "TCI") {
+                canvas.drawLine({
+                    strokeStyle: segment.orientation ? '#000' : '#00f',
+                    strokeWidth: 1,
+                    layer: true,
+                    endArrow: true,
+                    arrowRadius: 7,
+                    arrowAngle: 1,
+                    groups: [window.groups.path],
+                    x1: segment.start.x,
+                    y1: segment.start.y,
+                    x2: segment.end.x,
+                    y2: segment.end.y
+                });
+            } else if (segment.configIntervalType === "ACI") {
+                canvas.drawArc({
+                    strokeStyle: segment.orientation ? '#000' : '#00f',
+                    strokeWidth: 1,
+                    x: segment.center.x,
+                    y: segment.center.y,
+                    radius: segment.radius,
+                    layer: true,
+                    endArrow: true,
+                    arrowRadius: 7,
+                    arrowAngle: 1,
+                    groups: [window.groups.path],
+                    start: 1.57079633 - segment.arc_start,
+                    end: 1.57079633 - (segment.arc_start + segment.delta),
+                    ccw: segment.direction
+                });
+            }
         }
-    };
-    var line2 = {
-        start: {
-            x: 300,
-            y: 200
-        },
-        end: {
-            x: 400,
-            y: 400
-        }
-    };
-
-    canvas.drawLine({
-        strokeStyle: '#000',
-        strokeWidth: 1,
-        layer: true,
-        x1: line1.start.x,
-        y1: line1.start.y,
-        x2: line1.end.x,
-        y2: line1.end.y
-    });
-
-    canvas.drawLine({
-        strokeStyle: '#000',
-        strokeWidth: 1,
-        layer: true,
-        x1: line2.start.x,
-        y1: line2.start.y,
-        x2: line2.end.x,
-        y2: line2.end.y
-    });
-    var line_line_result = line_line(canvas, line1, line2);
-    if (line_line_result !== null) {
-        canvas.drawEllipse({
-            fillStyle: '#ff0',
-            opacity: 0.5,
-            layer: true,
-            x: line_line_result.x,
-            y: line_line_result.y,
-            width: 100, height: 100
-        });
     }
 
-    var arc = {
-        center: {
-            x: 650,
-            y: 250
-        },
-        radius: 50,
-        arc_start: -1.2,
-        delta: 5.77,
-        direction: true
-    };
-    var a = {
-        x: 600,
-        y: 300
-    };
-    var b = {
-        x: 700,
-        y: 270
-    };
-    canvas.drawLine({
-        strokeStyle: '#000',
-        strokeWidth: 1,
-        layer: true,
-        x1: a.x,
-        y1: a.y,
-        x2: b.x,
-        y2: b.y
-    });
-    canvas.drawArc({
-        strokeStyle: '#000',
-        layer: true,
-        x: arc.center.x,
-        y: arc.center.y,
-        radius: arc.radius,
-        start: 1.57079633 - arc.arc_start,
-        end: 1.57079633 - (arc.arc_start + arc.delta),
-        ccw: arc.direction
-    });
+    for (var i = 0; i < window.paths.length; i++) {
+        for (var j = i + 1; j < window.paths.length; j++) {
+            var path1 = window.paths[i];
+            var path2 = window.paths[j];
+            for(var segment_i1=0; segment_i1<path1.segments.length; segment_i1++){
+                for(var segment_i2=0; segment_i2<path2.segments.length; segment_i2++){
+                    var segment1 = path1.segments[segment_i1];
+                    var segment2 = path2.segments[segment_i2];
+                    console.log('i: ' + segment_i1 + ' j: ' + segment_i2);
+                    if(segment1.configIntervalType === 'TCI' && segment2.configIntervalType === 'TCI'){
+                        var line_line_result = line_line(canvas, segment1, segment2);
+                        if (line_line_result !== null) {
+                            canvas.drawEllipse({
+                                fillStyle: '#ff0',
+                                opacity: 0.5,
+                                layer: true,
+                                x: line_line_result.x,
+                                y: line_line_result.y,
+                                width: 100, height: 100
+                            });
+                        }
+                    } else if (segment1.configIntervalType === 'ACI' && segment2.configIntervalType === 'ACI') {
+                        var results = circle_circle(canvas, segment1, segment2);
+                        for (var result_i in results) {
+                            var result = results[result_i];
+                            canvas.drawEllipse({
+                                fillStyle: '#ff0',
+                                opacity: 0.5,
+                                layer: true,
+                                x: result.x,
+                                y: result.y,
+                                width: 100, height: 100
+                            });
+                        }
+                    } else if (segment1.configIntervalType === 'TCI' && segment2.configIntervalType === 'ACI') {
+                        var results = line_circle(canvas, segment1, segment2);
+                        for (var result_i in results) {
+                            var result = results[result_i];
+                            canvas.drawEllipse({
+                                fillStyle: '#ff0',
+                                opacity: 0.5,
+                                layer: true,
+                                x: result.x,
+                                y: result.y,
+                                width: 100, height: 100
+                            });
+                        }
+                    } else {
+                        var results = line_circle(canvas, segment2, segment1);
+                        for (var result_i in results) {
+                            var result = results[result_i];
+                            canvas.drawEllipse({
+                                fillStyle: '#ff0',
+                                opacity: 0.5,
+                                layer: true,
+                                x: result.x,
+                                y: result.y,
+                                width: 100, height: 100
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-    line_circle(canvas, arc, a, b);
+
+
+
+    // var circle1 = {
+    //     center: {
+    //         x: 750,
+    //         y: 400
+    //     },
+    //     radius: 50,
+    //     arc_start: -1.2,
+    //     delta: 5.77,
+    //     direction: true
+    // };
+    // var circle2 = {
+    //     center: {
+    //         x: 800,
+    //         y: 450
+    //     },
+    //     radius: 95,
+    //     arc_start: -1.2,
+    //     delta: -2.77,
+    //     direction: false
+    // };
+    // canvas.drawArc({
+    //     strokeStyle: '#000',
+    //     layer: true,
+    //     x: circle1.center.x,
+    //     y: circle1.center.y,
+    //     radius: circle1.radius,
+    //     start: 1.57079633 - circle1.arc_start,
+    //     end: 1.57079633 - (circle1.arc_start + circle1.delta),
+    //     ccw: circle1.direction
+    // });
+    // canvas.drawArc({
+    //     strokeStyle: '#000',
+    //     layer: true,
+    //     x: circle2.center.x,
+    //     y: circle2.center.y,
+    //     radius: circle2.radius,
+    //     start: 1.57079633 - circle2.arc_start,
+    //     end: 1.57079633 - (circle2.arc_start + circle2.delta),
+    //     ccw: circle2.direction
+    // });
+    // circle_circle(canvas, circle1, circle2);
+    //
+    // var line1 = {
+    //     start: {
+    //         x: 320,
+    //         y: 300
+    //     },
+    //     end: {
+    //         x: 400,
+    //         y: 200
+    //     }
+    // };
+    // var line2 = {
+    //     start: {
+    //         x: 300,
+    //         y: 200
+    //     },
+    //     end: {
+    //         x: 400,
+    //         y: 400
+    //     }
+    // };
+    //
+    // canvas.drawLine({
+    //     strokeStyle: '#000',
+    //     strokeWidth: 1,
+    //     layer: true,
+    //     x1: line1.start.x,
+    //     y1: line1.start.y,
+    //     x2: line1.end.x,
+    //     y2: line1.end.y
+    // });
+    //
+    // canvas.drawLine({
+    //     strokeStyle: '#000',
+    //     strokeWidth: 1,
+    //     layer: true,
+    //     x1: line2.start.x,
+    //     y1: line2.start.y,
+    //     x2: line2.end.x,
+    //     y2: line2.end.y
+    // });
+    // var line_line_result = line_line(canvas, line1, line2);
+    // if (line_line_result !== null) {
+    //     canvas.drawEllipse({
+    //         fillStyle: '#ff0',
+    //         opacity: 0.5,
+    //         layer: true,
+    //         x: line_line_result.x,
+    //         y: line_line_result.y,
+    //         width: 100, height: 100
+    //     });
+    // }
+    //
+    // var arc = {
+    //     center: {
+    //         x: 650,
+    //         y: 250
+    //     },
+    //     radius: 50,
+    //     arc_start: -1.2,
+    //     delta: 5.77,
+    //     direction: true
+    // };
+    // var a = {
+    //     x: 600,
+    //     y: 300
+    // };
+    // var b = {
+    //     x: 700,
+    //     y: 270
+    // };
+    // canvas.drawLine({
+    //     strokeStyle: '#000',
+    //     strokeWidth: 1,
+    //     layer: true,
+    //     x1: a.x,
+    //     y1: a.y,
+    //     x2: b.x,
+    //     y2: b.y
+    // });
+    // canvas.drawArc({
+    //     strokeStyle: '#000',
+    //     layer: true,
+    //     x: arc.center.x,
+    //     y: arc.center.y,
+    //     radius: arc.radius,
+    //     start: 1.57079633 - arc.arc_start,
+    //     end: 1.57079633 - (arc.arc_start + arc.delta),
+    //     ccw: arc.direction
+    // });
+    //
+    // line_circle(canvas, arc, a, b);
 }

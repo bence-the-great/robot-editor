@@ -1,7 +1,7 @@
 $(function () {
     var canvas = $('canvas');
     window.canvas = canvas;
-    // add_start_and_goal(canvas, robot_count);
+    add_start_and_goal(canvas, robot_count);
     setup_save(canvas);
     setup_load(canvas);
     setup_drawing(canvas);
@@ -43,5 +43,5 @@ $(function () {
         add_start_and_goal(canvas, robot_count);
     });
 
-    test_data(canvas);
+    // test_data(canvas);
 });
